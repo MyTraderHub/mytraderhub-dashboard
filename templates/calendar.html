@@ -71,7 +71,6 @@ function renderGrid(data) {
   let startDow = first.getDay();
   startDow = startDow === 0 ? 6 : startDow - 1;
   const daysInMonth = new Date(calYear, calMonth, 0).getDate();
-  const prevMonthDays = new Date(calYear, calMonth - 1, 0).getDate();
 
   const cells = [];
   for (let i = 0; i < startDow; i++) {
