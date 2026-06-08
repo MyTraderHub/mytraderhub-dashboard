@@ -4,161 +4,175 @@
   <h1 class="page-title">Account</h1>
 </div>
 
-<div class="acct-grid" id="acct-stats">
-  <div class="acct-card">
-    <div class="acct-card-val" id="acct-portfolio">—</div>
-    <div class="acct-card-label">Portfolio Value</div>
-  </div>
-  <div class="acct-card">
-    <div class="acct-card-val" id="acct-bp">—</div>
-    <div class="acct-card-label">Buying Power</div>
-  </div>
-  <div class="acct-card">
-    <div class="acct-card-val" id="acct-cash">—</div>
-    <div class="acct-card-label">Cash</div>
-  </div>
-  <div class="acct-card">
-    <div class="acct-card-val" id="acct-pl">—</div>
-    <div class="acct-card-label">Today's P&amp;L</div>
-  </div>
-</div>
-
-<div class="paper-badge">PAPER TRADING — no real money</div>
-
-<div class="section" id="dt-section">
-  <div class="section-title">Day Trades</div>
-  <div class="dt-bar-wrap">
-    <div class="stat-sub" id="dt-label">0 / 3 day trades used this week</div>
-    <div class="dt-bar-track">
-      <div class="dt-bar" id="dt-bar" style="width:0%"></div>
+<div class="panel-card acct-summary-card">
+  <div class="section-title">Account Summary</div>
+  <div class="acct-summary-grid">
+    <div class="acct-summary-row">
+      <span class="stat-sub">Portfolio Value</span>
+      <span class="acct-summary-val" id="acct-equity">—</span>
     </div>
-  </div>
-  <div class="pdt-banner hidden" id="pdt-banner">
-    ⚠ Pattern Day Trader status active — day trade restrictions apply
+    <div class="acct-summary-row">
+      <span class="stat-sub">Cash</span>
+      <span class="acct-summary-val" id="acct-cash">—</span>
+    </div>
+    <div class="acct-summary-row">
+      <span class="stat-sub">Buying Power</span>
+      <span class="acct-summary-val" id="acct-bp">—</span>
+    </div>
+    <div class="acct-summary-row">
+      <span class="stat-sub">Day Trade Count</span>
+      <span class="acct-summary-val" id="acct-dt">—</span>
+    </div>
+    <div class="acct-summary-row">
+      <span class="stat-sub">Pattern Day Trader</span>
+      <span id="acct-pdt"><span class="badge badge-pdt-no">No</span></span>
+    </div>
+    <div class="acct-summary-row">
+      <span class="stat-sub">Account Status</span>
+      <span class="acct-summary-val" id="acct-status">—</span>
+    </div>
   </div>
 </div>
 
 <div class="section">
   <div class="section-title">Open Orders</div>
-  <div id="open-orders-list">
-    <div class="skeleton skeleton-card" style="height:48px"></div>
+  <div class="table-scroll">
+    <table class="data-table" id="open-orders-table">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Side</th>
+          <th>Qty</th>
+          <th>Type</th>
+          <th>TIF</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="open-orders-tbody">
+        <tr><td colspan="7"><div class="skeleton skeleton-card" style="height:40px"></div></td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <div class="section">
   <div class="section-title">Order History</div>
-  <div id="order-history-list">
-    <div class="skeleton skeleton-card" style="height:48px"></div>
+  <div class="table-scroll">
+    <table class="data-table" id="history-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Ticker</th>
+          <th>Side</th>
+          <th>Qty</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Filled</th>
+          <th>Avg Fill</th>
+        </tr>
+      </thead>
+      <tbody id="history-tbody">
+        <tr><td colspan="8"><div class="skeleton skeleton-card" style="height:40px"></div></td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-let ordersRefreshTimer = null;
-
-function dtBarColor(count) {
-  if (count <= 1) return 'var(--green)';
-  if (count === 2) return 'var(--orange)';
-  return 'var(--red)';
+function sideBadge(side) {
+  const s = (side || '').toLowerCase();
+  if (s === 'buy') return '<span class="side-buy">Buy</span>';
+  if (s === 'sell') return '<span class="side-sell">Sell</span>';
+  return '<span class="stat-sub">' + escapeHtml(side || '—') + '</span>';
 }
 
-async function loadAccountStats() {
+async function loadAccount() {
   try {
-    const [acct, home] = await Promise.all([api('/api/account'), api('/api/home')]);
-    document.getElementById('acct-portfolio').textContent = fmtMoney(acct.portfolio_value);
-    document.getElementById('acct-bp').textContent = fmtMoney(acct.buying_power);
+    const acct = await api('/api/account');
+    document.getElementById('acct-equity').textContent = fmtMoney(acct.portfolio_value ?? acct.equity);
     document.getElementById('acct-cash').textContent = fmtMoney(acct.cash);
-    const plEl = document.getElementById('acct-pl');
-    plEl.textContent = fmtMoney(home.daily_pl) + ' (' + fmtPct(home.daily_pl_pct) + ')';
-    plEl.className = 'acct-card-val ' + plClass(home.daily_pl);
-
-    const dt = acct.daytrade_count || 0;
-    document.getElementById('dt-label').textContent = dt + ' / 3 day trades used this week';
-    const bar = document.getElementById('dt-bar');
-    bar.style.width = Math.min(dt / 3 * 100, 100) + '%';
-    bar.style.background = dtBarColor(dt);
-
-    const pdt = document.getElementById('pdt-banner');
-    if (acct.pattern_day_trader) pdt.classList.remove('hidden');
-    else pdt.classList.add('hidden');
+    document.getElementById('acct-bp').textContent = fmtMoney(acct.buying_power);
+    document.getElementById('acct-dt').textContent = String(acct.daytrade_count ?? 0);
+    const pdtEl = document.getElementById('acct-pdt');
+    if (acct.pattern_day_trader) {
+      pdtEl.innerHTML = '<span class="badge badge-pdt-yes">PDT</span>';
+    } else {
+      pdtEl.innerHTML = '<span class="badge badge-pdt-no">No</span>';
+    }
+    document.getElementById('acct-status').textContent = acct.status || '—';
   } catch (_) {}
 }
 
-function renderOpenOrders(orders) {
-  const el = document.getElementById('open-orders-list');
-  if (!orders.length) {
-    el.innerHTML = '<p class="stat-sub">No open orders</p>';
-    return;
-  }
-  el.innerHTML = orders.map(o => {
-    const sideCls = o.side === 'buy' ? 'side-buy' : 'side-sell';
-    const sideLbl = (o.side || '').toUpperCase();
-    const limit = o.limit_price ? ' · $' + parseFloat(o.limit_price).toFixed(2) : '';
-    return '<div class="order-row">' +
-      '<div class="order-row-main">' +
-      '<span class="order-ticker">' + escapeHtml(o.symbol) + '</span> ' +
-      '<span class="' + sideCls + '">' + sideLbl + '</span> ' +
-      '<span class="stat-sub">' + escapeHtml(String(o.qty)) + ' · ' + escapeHtml(o.type || '') + limit + '</span>' +
-      '</div>' +
-      '<button type="button" class="btn btn-sm btn-ghost tap-feedback" data-cancel="' + escapeHtml(o.id) + '">Cancel</button>' +
-      '</div>';
-  }).join('');
-  el.querySelectorAll('[data-cancel]').forEach(btn => {
-    btn.onclick = async () => {
-      try {
-        await fetch('/api/orders/' + encodeURIComponent(btn.dataset.cancel), { method: 'DELETE' });
-        loadOpenOrders();
-      } catch (_) {}
-    };
-  });
-}
-
 async function loadOpenOrders() {
+  const tbody = document.getElementById('open-orders-tbody');
   try {
     const data = await api('/api/orders');
-    renderOpenOrders(data.orders || []);
-  } catch (_) {
-    document.getElementById('open-orders-list').innerHTML = '<p class="stat-sub">Unable to load orders</p>';
-  }
-}
-
-async function loadOrderHistory() {
-  const el = document.getElementById('order-history-list');
-  try {
-    const data = await api('/api/orders/history?limit=50');
-    const orders = (Array.isArray(data) ? data : []).slice(0, 20);
+    const orders = data.orders || [];
     if (!orders.length) {
-      el.innerHTML = '<p class="stat-sub">No order history</p>';
+      tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No open orders</td></tr>';
       return;
     }
-    el.innerHTML = orders.map(o => {
-      const sideCls = o.side === 'buy' ? 'side-buy' : 'side-sell';
-      const price = o.filled_avg ? '$' + parseFloat(o.filled_avg).toFixed(2) : '—';
-      const qtyLbl = o.qty_type === 'notional'
-        ? fmtMoney(o.qty)
-        : escapeHtml(String(o.qty)) + ' sh';
-      return '<div class="order-row order-row-compact">' +
-        '<div>' +
-        '<span class="order-ticker">' + escapeHtml(o.ticker || '') + '</span> ' +
-        '<span class="' + sideCls + '">' + escapeHtml((o.side || '').toUpperCase()) + '</span> ' +
-        '<span class="stat-sub">' + qtyLbl + ' · ' + price + '</span>' +
-        '</div>' +
-        '<span class="stat-sub order-date">' + escapeHtml(o.created_at || '') + '</span>' +
-        '</div>';
+    tbody.innerHTML = orders.map(o => {
+      const ticker = o.symbol || o.ticker || '';
+      const qty = o.qty || o.notional || '—';
+      return '<tr>' +
+        '<td class="order-ticker">' + escapeHtml(ticker) + '</td>' +
+        '<td>' + sideBadge(o.side) + '</td>' +
+        '<td>' + escapeHtml(String(qty)) + '</td>' +
+        '<td>' + escapeHtml(o.type || o.order_type || '—') + '</td>' +
+        '<td>' + escapeHtml(o.tif || o.time_in_force || '—') + '</td>' +
+        '<td>' + escapeHtml(o.status || '—') + '</td>' +
+        '<td><button type="button" class="btn btn-sm btn-ghost tap-feedback" data-cancel="' +
+          escapeHtml(o.id) + '">Cancel</button></td>' +
+        '</tr>';
     }).join('');
+    tbody.querySelectorAll('[data-cancel]').forEach(btn => {
+      btn.onclick = async () => {
+        try {
+          await fetch('/api/orders/' + encodeURIComponent(btn.dataset.cancel), { method: 'DELETE' });
+          loadOpenOrders();
+        } catch (_) {}
+      };
+    });
   } catch (_) {
-    el.innerHTML = '<p class="stat-sub">Unable to load history</p>';
+    tbody.innerHTML = '<tr><td colspan="7" class="table-empty">Unable to load orders</td></tr>';
   }
 }
 
-async function refreshAccount() {
-  await Promise.all([loadAccountStats(), loadOpenOrders(), loadOrderHistory()]);
+async function loadHistory() {
+  const tbody = document.getElementById('history-tbody');
+  try {
+    const history = await api('/api/orders/history');
+    const rows = Array.isArray(history) ? history : (history.orders || []);
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No order history</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(o => {
+      const qty = o.qty_type === 'notional' ? fmtMoney(o.qty) : String(o.qty || '—');
+      const avg = o.filled_avg ? fmtMoney(o.filled_avg) : '—';
+      return '<tr>' +
+        '<td>' + escapeHtml(o.created_at || '—') + '</td>' +
+        '<td class="order-ticker">' + escapeHtml(o.ticker || '') + '</td>' +
+        '<td>' + sideBadge(o.side) + '</td>' +
+        '<td>' + escapeHtml(qty) + '</td>' +
+        '<td>' + escapeHtml(o.order_type || '—') + '</td>' +
+        '<td>' + escapeHtml(o.status || '—') + '</td>' +
+        '<td>' + escapeHtml(String(o.filled_qty || '—')) + '</td>' +
+        '<td>' + escapeHtml(avg) + '</td>' +
+        '</tr>';
+    }).join('');
+  } catch (_) {
+    tbody.innerHTML = '<tr><td colspan="8" class="table-empty">Unable to load history</td></tr>';
+  }
 }
 
-refreshAccount();
-ordersRefreshTimer = setInterval(loadOpenOrders, 60000);
-
-setupPullToRefresh(refreshAccount);
+loadAccount();
+loadOpenOrders();
+loadHistory();
+setInterval(loadOpenOrders, 30000);
 </script>
 {% endblock %}
