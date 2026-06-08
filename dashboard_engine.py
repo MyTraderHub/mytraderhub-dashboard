@@ -175,27 +175,28 @@ def cancel_alpaca_order(order_id: str) -> bool:
 
 
 def get_order_history(limit: int = 50) -> list:
-    data = _alpaca_get("/v2/orders", {
-        "status": "closed",
-        "limit": limit,
-        "direction": "desc",
-    })
+    """Fetch filled/cancelled orders from Alpaca."""
+    params = {"status": "all", "limit": limit, "direction": "desc"}
+    data = _alpaca_get("/v2/orders", params)
     if not isinstance(data, list):
         return []
-    return [
-        {
+    orders = []
+    for o in data:
+        orders.append({
             "id": o.get("id", ""),
-            "symbol": o.get("symbol", ""),
+            "ticker": o.get("symbol", ""),
             "side": o.get("side", ""),
-            "qty": o.get("qty"),
-            "filled_avg_price": o.get("filled_avg_price"),
-            "filled_at": (o.get("filled_at") or "")[:10],
+            "qty": o.get("qty") or o.get("notional") or "0",
+            "qty_type": "notional" if o.get("notional") else "shares",
+            "order_type": o.get("type", "market"),
             "status": o.get("status", ""),
-            "type": o.get("type", ""),
-            "limit_price": o.get("limit_price"),
-        }
-        for o in data
-    ]
+            "filled_qty": o.get("filled_qty", "0"),
+            "filled_avg": o.get("filled_avg_price") or "",
+            "limit_price": o.get("limit_price") or "",
+            "tif": o.get("time_in_force", ""),
+            "created_at": o.get("created_at", "")[:10] if o.get("created_at") else "",
+        })
+    return orders
 
 
 def get_ticker_news(ticker: str, limit: int = 5) -> list:

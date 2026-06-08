@@ -134,14 +134,17 @@ async function loadOrderHistory() {
     }
     el.innerHTML = orders.map(o => {
       const sideCls = o.side === 'buy' ? 'side-buy' : 'side-sell';
-      const price = o.filled_avg_price ? '$' + parseFloat(o.filled_avg_price).toFixed(2) : '—';
+      const price = o.filled_avg ? '$' + parseFloat(o.filled_avg).toFixed(2) : '—';
+      const qtyLbl = o.qty_type === 'notional'
+        ? fmtMoney(o.qty)
+        : escapeHtml(String(o.qty)) + ' sh';
       return '<div class="order-row order-row-compact">' +
         '<div>' +
-        '<span class="order-ticker">' + escapeHtml(o.symbol) + '</span> ' +
+        '<span class="order-ticker">' + escapeHtml(o.ticker || '') + '</span> ' +
         '<span class="' + sideCls + '">' + escapeHtml((o.side || '').toUpperCase()) + '</span> ' +
-        '<span class="stat-sub">' + escapeHtml(String(o.qty)) + ' sh · ' + price + '</span>' +
+        '<span class="stat-sub">' + qtyLbl + ' · ' + price + '</span>' +
         '</div>' +
-        '<span class="stat-sub order-date">' + escapeHtml(o.filled_at || '') + '</span>' +
+        '<span class="stat-sub order-date">' + escapeHtml(o.created_at || '') + '</span>' +
         '</div>';
     }).join('');
   } catch (_) {
