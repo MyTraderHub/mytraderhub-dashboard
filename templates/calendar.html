@@ -22,6 +22,8 @@
 
 <div class="cal-grid" id="cal-grid"></div>
 
+<p class="cal-empty hidden" id="cal-empty">No trades logged this month</p>
+
 <div class="cal-summary" id="cal-summary">
   <div class="cal-stat">
     <div class="cal-stat-val" id="cal-win-rate">—</div>
@@ -73,20 +75,19 @@ function renderGrid(data) {
 
   const cells = [];
   for (let i = 0; i < startDow; i++) {
-    const d = prevMonthDays - startDow + i + 1;
-    cells.push({ day: d, outside: true, key: '' });
+    cells.push({ outside: true, key: '' });
   }
   for (let d = 1; d <= daysInMonth; d++) {
     cells.push({ day: d, outside: false, key: dateKey(calYear, calMonth, d) });
   }
-  while (cells.length % 7 !== 0) {
-    cells.push({ day: cells.length - daysInMonth - startDow + 1, outside: true, key: '' });
+  while (cells.length < 42) {
+    cells.push({ outside: true, key: '' });
   }
 
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = cells.map(c => {
     if (c.outside) {
-      return '<div class="cal-cell is-outside"><span class="cal-day-num">' + c.day + '</span></div>';
+      return '<div class="cal-cell is-outside"></div>';
     }
     const info = days[c.key];
     const isToday = c.key === todayStr;
@@ -118,6 +119,12 @@ function renderGrid(data) {
   mplEl.textContent = (mpl >= 0 ? '+' : '') + mpl.toFixed(1) + 'R';
   mplEl.className = 'cal-stat-val ' + plClass(mpl);
   document.getElementById('cal-total-trades').textContent = data.total_trades || 0;
+
+  const emptyEl = document.getElementById('cal-empty');
+  if (emptyEl) {
+    if ((data.total_trades || 0) === 0) emptyEl.classList.remove('hidden');
+    else emptyEl.classList.add('hidden');
+  }
 }
 
 async function loadCalendar() {

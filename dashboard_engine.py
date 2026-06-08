@@ -254,25 +254,32 @@ def get_calendar_data(year: int, month: int, user_id: str = "default") -> dict:
         if ticker and ticker not in entry["tickers"]:
             entry["tickers"].append(ticker)
 
+    clean_days: dict[str, dict] = {}
     for ts, d in days.items():
         if d["wins"] > 0 and d["losses"] == 0:
-            d["outcome"] = "win"
+            outcome = "win"
         elif d["losses"] > 0 and d["wins"] == 0:
-            d["outcome"] = "loss"
+            outcome = "loss"
         elif d["wins"] > 0 and d["losses"] > 0:
-            d["outcome"] = "mixed"
+            outcome = "mixed"
         else:
-            d["outcome"] = "pending"
+            outcome = "pending"
+        clean_days[ts] = {
+            "trade_count": d["trade_count"],
+            "pl_sum": d["pl_sum"],
+            "outcome": outcome,
+            "tickers": d["tickers"],
+        }
 
-    total_trades = sum(d["trade_count"] for d in days.values())
-    total_wins = sum(d["wins"] for d in days.values())
+    total_trades = sum(d["trade_count"] for d in clean_days.values())
+    total_wins = sum(days[ts]["wins"] for ts in clean_days)
     win_rate = round(total_wins / total_trades * 100, 1) if total_trades else 0
-    month_pl = round(sum(d["pl_sum"] for d in days.values()), 2)
+    month_pl = round(sum(d["pl_sum"] for d in clean_days.values()), 2)
 
     return {
         "year": year,
         "month": month,
-        "days": days,
+        "days": clean_days,
         "month_pl": month_pl,
         "win_rate": win_rate,
         "total_trades": total_trades,
