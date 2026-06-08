@@ -126,8 +126,8 @@ async function loadOpenOrders() {
 async function loadOrderHistory() {
   const el = document.getElementById('order-history-list');
   try {
-    const data = await api('/api/orders/history');
-    const orders = (data.orders || []).slice(0, 20);
+    const data = await api('/api/orders/history?limit=50');
+    const orders = (Array.isArray(data) ? data : []).slice(0, 20);
     if (!orders.length) {
       el.innerHTML = '<p class="stat-sub">No order history</p>';
       return;

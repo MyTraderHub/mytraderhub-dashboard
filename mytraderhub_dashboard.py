@@ -51,8 +51,8 @@ def page_watchlist():
 
 @app.route("/account")
 @require_auth
-def page_account():
-    return render_template("account.html", page="account")
+def account_page():
+    return render_template("account.html")
 
 
 @app.route("/calendar")
@@ -94,9 +94,9 @@ def api_orders_cancel(order_id):
 
 @app.route("/api/orders/history")
 @require_auth
-def api_orders_history():
-    orders = de.get_order_history(limit=50)
-    return jsonify({"ok": True, "orders": orders})
+def api_order_history():
+    limit = int(request.args.get("limit", 50))
+    return jsonify(de.get_order_history(limit))
 
 
 @app.route("/api/orders/place", methods=["POST"])
