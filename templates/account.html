@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Account</h1>
+</div>
+
+<div class="acct-grid" id="acct-stats">
+  <div class="acct-card">
+    <div class="acct-card-val" id="acct-portfolio">—</div>
+    <div class="acct-card-label">Portfolio Value</div>
+  </div>
+  <div class="acct-card">
+    <div class="acct-card-val" id="acct-bp">—</div>
+    <div class="acct-card-label">Buying Power</div>
+  </div>
+  <div class="acct-card">
+    <div class="acct-card-val" id="acct-cash">—</div>
+    <div class="acct-card-label">Cash</div>
+  </div>
+  <div class="acct-card">
+    <div class="acct-card-val" id="acct-pl">—</div>
+    <div class="acct-card-label">Today's P&amp;L</div>
+  </div>
+</div>
+
+<div class="paper-badge">PAPER TRADING — no real money</div>
+
+<div class="section" id="dt-section">
+  <div class="section-title">Day Trades</div>
+  <div class="dt-bar-wrap">
+    <div class="stat-sub" id="dt-label">0 / 3 day trades used this week</div>
+    <div class="dt-bar-track">
+      <div class="dt-bar" id="dt-bar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="pdt-banner hidden" id="pdt-banner">
+    ⚠ Pattern Day Trader status active — day trade restrictions apply
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Open Orders</div>
+  <div id="open-orders-list">
+    <div class="skeleton skeleton-card" style="height:48px"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Order History</div>
+  <div id="order-history-list">
+    <div class="skeleton skeleton-card" style="height:48px"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let ordersRefreshTimer = null;
+
+function dtBarColor(count) {
+  if (count <= 1) return 'var(--green)';
+  if (count === 2) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+async function loadAccountStats() {
+  try {
+    const [acct, home] = await Promise.all([api('/api/account'), api('/api/home')]);
+    document.getElementById('acct-portfolio').textContent = fmtMoney(acct.portfolio_value);
+    document.getElementById('acct-bp').textContent = fmtMoney(acct.buying_power);
+    document.getElementById('acct-cash').textContent = fmtMoney(acct.cash);
+    const plEl = document.getElementById('acct-pl');
+    plEl.textContent = fmtMoney(home.daily_pl) + ' (' + fmtPct(home.daily_pl_pct) + ')';
+    plEl.className = 'acct-card-val ' + plClass(home.daily_pl);
+
+    const dt = acct.daytrade_count || 0;
+    document.getElementById('dt-label').textContent = dt + ' / 3 day trades used this week';
+    const bar = document.getElementById('dt-bar');
+    bar.style.width = Math.min(dt / 3 * 100, 100) + '%';
+    bar.style.background = dtBarColor(dt);
+
+    const pdt = document.getElementById('pdt-banner');
+    if (acct.pattern_day_trader) pdt.classList.remove('hidden');
+    else pdt.classList.add('hidden');
+  } catch (_) {}
+}
+
+function renderOpenOrders(orders) {
+  const el = document.getElementById('open-orders-list');
+  if (!orders.length) {
+    el.innerHTML = '<p class="stat-sub">No open orders</p>';
+    return;
+  }
+  el.innerHTML = orders.map(o => {
+    const sideCls = o.side === 'buy' ? 'side-buy' : 'side-sell';
+    const sideLbl = (o.side || '').toUpperCase();
+    const limit = o.limit_price ? ' · $' + parseFloat(o.limit_price).toFixed(2) : '';
+    return '<div class="order-row">' +
+      '<div class="order-row-main">' +
+      '<span class="order-ticker">' + escapeHtml(o.symbol) + '</span> ' +
+      '<span class="' + sideCls + '">' + sideLbl + '</span> ' +
+      '<span class="stat-sub">' + escapeHtml(String(o.qty)) + ' · ' + escapeHtml(o.type || '') + limit + '</span>' +
+      '</div>' +
+      '<button type="button" class="btn btn-sm btn-ghost tap-feedback" data-cancel="' + escapeHtml(o.id) + '">Cancel</button>' +
+      '</div>';
+  }).join('');
+  el.querySelectorAll('[data-cancel]').forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        await fetch('/api/orders/' + encodeURIComponent(btn.dataset.cancel), { method: 'DELETE' });
+        loadOpenOrders();
+      } catch (_) {}
+    };
+  });
+}
+
+async function loadOpenOrders() {
+  try {
+    const data = await api('/api/orders');
+    renderOpenOrders(data.orders || []);
+  } catch (_) {
+    document.getElementById('open-orders-list').innerHTML = '<p class="stat-sub">Unable to load orders</p>';
+  }
+}
+
+async function loadOrderHistory() {
+  const el = document.getElementById('order-history-list');
+  try {
+    const data = await api('/api/orders/history');
+    const orders = (data.orders || []).slice(0, 20);
+    if (!orders.length) {
+      el.innerHTML = '<p class="stat-sub">No order history</p>';
+      return;
+    }
+    el.innerHTML = orders.map(o => {
+      const sideCls = o.side === 'buy' ? 'side-buy' : 'side-sell';
+      const price = o.filled_avg_price ? '$' + parseFloat(o.filled_avg_price).toFixed(2) : '—';
+      return '<div class="order-row order-row-compact">' +
+        '<div>' +
+        '<span class="order-ticker">' + escapeHtml(o.symbol) + '</span> ' +
+        '<span class="' + sideCls + '">' + escapeHtml((o.side || '').toUpperCase()) + '</span> ' +
+        '<span class="stat-sub">' + escapeHtml(String(o.qty)) + ' sh · ' + price + '</span>' +
+        '</div>' +
+        '<span class="stat-sub order-date">' + escapeHtml(o.filled_at || '') + '</span>' +
+        '</div>';
+    }).join('');
+  } catch (_) {
+    el.innerHTML = '<p class="stat-sub">Unable to load history</p>';
+  }
+}
+
+async function refreshAccount() {
+  await Promise.all([loadAccountStats(), loadOpenOrders(), loadOrderHistory()]);
+}
+
+refreshAccount();
+ordersRefreshTimer = setInterval(loadOpenOrders, 60000);
+
+setupPullToRefresh(refreshAccount);
+</script>
+{% endblock %}

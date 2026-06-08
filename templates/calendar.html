@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Trade Journal</h1>
+</div>
+
+<div class="cal-header">
+  <button type="button" class="cal-nav-btn tap-feedback" id="cal-prev" aria-label="Previous month">‹</button>
+  <div class="cal-month-title" id="cal-month-title">—</div>
+  <button type="button" class="cal-nav-btn tap-feedback" id="cal-next" aria-label="Next month">›</button>
+</div>
+
+<div class="cal-dow-row">
+  <div class="cal-dow">Mon</div>
+  <div class="cal-dow">Tue</div>
+  <div class="cal-dow">Wed</div>
+  <div class="cal-dow">Thu</div>
+  <div class="cal-dow">Fri</div>
+  <div class="cal-dow">Sat</div>
+  <div class="cal-dow">Sun</div>
+</div>
+
+<div class="cal-grid" id="cal-grid"></div>
+
+<div class="cal-summary" id="cal-summary">
+  <div class="cal-stat">
+    <div class="cal-stat-val" id="cal-win-rate">—</div>
+    <div class="cal-stat-label">Win Rate</div>
+  </div>
+  <div class="cal-stat">
+    <div class="cal-stat-val" id="cal-month-pl">—</div>
+    <div class="cal-stat-label">Month P&amp;L</div>
+  </div>
+  <div class="cal-stat">
+    <div class="cal-stat-val" id="cal-total-trades">—</div>
+    <div class="cal-stat-label">Total Trades</div>
+  </div>
+</div>
+
+<div class="sheet hidden" id="cal-day-sheet">
+  <div class="sheet-panel">
+    <div class="sheet-header">
+      <h2 class="sheet-title" id="cal-day-title">—</h2>
+      <button type="button" class="sheet-close tap-feedback" id="cal-day-close" aria-label="Close">✕</button>
+    </div>
+    <div class="sheet-body" id="cal-day-trades"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth() + 1;
+const todayStr = new Date().toISOString().slice(0, 10);
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function dateKey(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+
+function updateTitle() {
+  document.getElementById('cal-month-title').textContent = MONTHS[calMonth - 1] + ' ' + calYear;
+}
+
+function renderGrid(data) {
+  const days = data.days || {};
+  const first = new Date(calYear, calMonth - 1, 1);
+  let startDow = first.getDay();
+  startDow = startDow === 0 ? 6 : startDow - 1;
+  const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+  const prevMonthDays = new Date(calYear, calMonth - 1, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < startDow; i++) {
+    const d = prevMonthDays - startDow + i + 1;
+    cells.push({ day: d, outside: true, key: '' });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, outside: false, key: dateKey(calYear, calMonth, d) });
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push({ day: cells.length - daysInMonth - startDow + 1, outside: true, key: '' });
+  }
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = cells.map(c => {
+    if (c.outside) {
+      return '<div class="cal-cell is-outside"><span class="cal-day-num">' + c.day + '</span></div>';
+    }
+    const info = days[c.key];
+    const isToday = c.key === todayStr;
+    const isFuture = c.key > todayStr;
+    let cls = 'cal-cell';
+    if (info) cls += ' has-trades';
+    if (isToday) cls += ' is-today';
+    if (isFuture) cls += ' is-future';
+
+    let inner = '<span class="cal-day-num">' + c.day + '</span>';
+    if (info) {
+      inner += '<div class="cal-dot ' + escapeHtml(info.outcome || 'pending') + '"></div>';
+      const pl = info.pl_sum || 0;
+      const plCls = pl >= 0 ? 'pos' : 'neg';
+      const sign = pl >= 0 ? '+' : '';
+      inner += '<div class="cal-pl ' + plCls + '">' + sign + pl.toFixed(1) + 'R</div>';
+    }
+    return '<div class="' + cls + '" data-date="' + escapeHtml(c.key) + '"' +
+      (info ? ' role="button" tabindex="0"' : '') + '>' + inner + '</div>';
+  }).join('');
+
+  grid.querySelectorAll('.has-trades').forEach(cell => {
+    cell.addEventListener('click', () => openDaySheet(cell.dataset.date));
+  });
+
+  document.getElementById('cal-win-rate').textContent = (data.win_rate || 0) + '%';
+  const mpl = data.month_pl || 0;
+  const mplEl = document.getElementById('cal-month-pl');
+  mplEl.textContent = (mpl >= 0 ? '+' : '') + mpl.toFixed(1) + 'R';
+  mplEl.className = 'cal-stat-val ' + plClass(mpl);
+  document.getElementById('cal-total-trades').textContent = data.total_trades || 0;
+}
+
+async function loadCalendar() {
+  updateTitle();
+  try {
+    const data = await api('/api/calendar?year=' + calYear + '&month=' + calMonth);
+    renderGrid(data);
+  } catch (_) {
+    document.getElementById('cal-grid').innerHTML = '<p class="stat-sub">Unable to load calendar</p>';
+  }
+}
+
+function formatDayTitle(dateStr) {
+  const parts = dateStr.split('-');
+  const m = parseInt(parts[1], 10) - 1;
+  const d = parseInt(parts[2], 10);
+  return MONTHS[m] + ' ' + d;
+}
+
+async function openDaySheet(dateStr) {
+  const sheet = document.getElementById('cal-day-sheet');
+  const body = document.getElementById('cal-day-trades');
+  document.getElementById('cal-day-title').textContent = formatDayTitle(dateStr);
+  body.innerHTML = '<div class="skeleton skeleton-card" style="height:48px"></div>';
+  sheet.classList.remove('hidden');
+
+  try {
+    const data = await api('/api/calendar/day?date=' + encodeURIComponent(dateStr));
+    const trades = data.trades || [];
+    if (!trades.length) {
+      body.innerHTML = '<p class="stat-sub">Rest day</p>';
+      return;
+    }
+    body.innerHTML = trades.map(t => {
+      const outcome = (t.outcome || 'pending').toLowerCase();
+      const oc = outcome === 'win' ? 'side-buy' : outcome === 'loss' ? 'side-sell' : 'stat-sub';
+      const rm = parseFloat(t.r_multiple || 0);
+      const entry = t.entry_price != null ? '$' + parseFloat(t.entry_price).toFixed(2) : '—';
+      const exit = t.exit_price != null ? '$' + parseFloat(t.exit_price).toFixed(2) : '—';
+      return '<div class="order-row order-row-compact">' +
+        '<div>' +
+        '<span class="order-ticker">' + escapeHtml(t.ticker || '') + '</span> ' +
+        (t.grade ? '<span class="badge">' + escapeHtml(t.grade) + '</span> ' : '') +
+        '<span class="' + oc + '">' + escapeHtml(outcome.toUpperCase()) + '</span> ' +
+        '<span class="badge">' + (rm >= 0 ? '+' : '') + rm.toFixed(1) + 'R</span>' +
+        '<div class="stat-sub">' + entry + ' → ' + exit + '</div>' +
+        (t.setup_type ? '<div class="stat-sub">' + escapeHtml(t.setup_type) + '</div>' : '') +
+        '</div></div>';
+    }).join('');
+  } catch (_) {
+    body.innerHTML = '<p class="stat-sub">Unable to load trades</p>';
+  }
+}
+
+document.getElementById('cal-prev').onclick = () => {
+  calMonth--;
+  if (calMonth < 1) { calMonth = 12; calYear--; }
+  loadCalendar();
+};
+document.getElementById('cal-next').onclick = () => {
+  calMonth++;
+  if (calMonth > 12) { calMonth = 1; calYear++; }
+  loadCalendar();
+};
+document.getElementById('cal-day-close').onclick = () => {
+  document.getElementById('cal-day-sheet').classList.add('hidden');
+};
+
+loadCalendar();
+setupPullToRefresh(loadCalendar);
+</script>
+{% endblock %}

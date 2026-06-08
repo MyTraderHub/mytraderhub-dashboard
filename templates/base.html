@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>MyTraderHub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+  <div id="market-bar" class="market-bar">
+    <div class="market-bar-inner" id="market-bar-inner">
+      <span class="stat-sub">Loading market…</span>
+    </div>
+  </div>
+
+  <main class="main-content" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="/" class="{% if page == 'home' %}active{% endif %}">
+      <span class="nav-icon-wrap"><img src="{{ url_for('static', filename='icons/nav/home.svg') }}" alt="" class="nav-icon"></span>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="/account" data-theme="execution" class="{% if page == 'account' %}active{% endif %}">
+      <span class="nav-icon-wrap"><img src="{{ url_for('static', filename='icons/nav/stats.svg') }}" alt="" class="nav-icon"></span>
+      <span class="nav-label">Account</span>
+    </a>
+    <a href="/watchlist" class="{% if page == 'watchlist' %}active{% endif %}">
+      <span class="nav-icon-wrap"><img src="{{ url_for('static', filename='icons/nav/watch.svg') }}" alt="" class="nav-icon"></span>
+      <span class="nav-label">Watch</span>
+    </a>
+    <a href="/calendar" class="{% if page == 'calendar' %}active{% endif %}">
+      <span class="nav-icon-wrap"><img src="{{ url_for('static', filename='icons/nav/journal.svg') }}" alt="" class="nav-icon"></span>
+      <span class="nav-label">Journal</span>
+    </a>
+  </nav>
+
+  <div id="order-sheet" class="sheet hidden"></div>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

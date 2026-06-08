@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Watchlist</h1>
+</div>
+
+<div class="wl-search-wrap">
+  <input type="text" class="wl-search tap-feedback" id="wl-search" placeholder="Search ticker…" autocomplete="off">
+</div>
+
+<div class="wl-list" id="wl-list">
+  <div class="skeleton skeleton-card" style="height:56px"></div>
+  <div class="skeleton skeleton-card" style="height:56px"></div>
+</div>
+
+<div class="sheet hidden" id="wl-stock-sheet">
+  <div class="sheet-panel wl-stock-panel" id="wl-stock-panel">
+    <div class="sheet-header">
+      <div>
+        <h2 class="sheet-title" id="wl-stock-symbol">—</h2>
+        <div class="stat-sub" id="wl-stock-name"></div>
+      </div>
+      <button type="button" class="sheet-close tap-feedback" id="wl-stock-close" aria-label="Close">✕</button>
+    </div>
+    <div class="wl-stock-quote" id="wl-stock-quote">
+      <div class="skeleton skeleton-card" style="height:40px"></div>
+    </div>
+
+    <div class="wl-stock-news-wrap" id="wl-stock-news-wrap">
+      <div class="wl-stock-news-label">Latest News</div>
+      <div class="wl-stock-news-list" id="wl-stock-news-list">
+        <div class="skeleton skeleton-card" style="height:48px"></div>
+        <div class="skeleton skeleton-card" style="height:48px"></div>
+      </div>
+    </div>
+
+    <div class="wl-alert-section" id="wl-alert-section">
+      <div class="wl-stock-news-label">Price Alerts</div>
+      <div class="wl-alert-set-row">
+        <select class="wl-alert-dir tap-feedback" id="wl-alert-dir">
+          <option value="above">Above</option>
+          <option value="below">Below</option>
+        </select>
+        <input type="number" class="wl-alert-price-input" id="wl-alert-price"
+               placeholder="0.00" step="0.01" inputmode="decimal" min="0"
+               aria-label="Alert price target">
+        <button type="button" class="btn btn-sm tap-feedback" id="wl-set-alert-btn">Set</button>
+      </div>
+      <div class="wl-active-alerts" id="wl-active-alerts"></div>
+    </div>
+
+    <div class="wl-stock-lists" id="wl-stock-lists"></div>
+
+    <div class="wl-stock-actions">
+      <button type="button" class="btn btn-buy tap-feedback" id="wl-buy-btn">Buy</button>
+      <button type="button" class="btn btn-sell tap-feedback" id="wl-sell-btn">Sell</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const DEFAULT_WATCHLIST = ['AAPL', 'MSFT', 'NVDA', 'TSLA', 'SPY'];
+let wlActiveStock = null;
+let wlPrices = {};
+
+async function loadWatchlist() {
+  const el = document.getElementById('wl-list');
+  el.innerHTML = DEFAULT_WATCHLIST.map(sym =>
+    '<div class="wl-row tap-feedback" data-sym="' + sym + '">' +
+    '<span class="wl-ticker">' + sym + '</span>' +
+    '<span class="wl-price" id="wl-price-' + sym + '">—</span>' +
+    '</div>'
+  ).join('');
+  el.querySelectorAll('.wl-row').forEach(row => {
+    row.onclick = () => openWlStockSheet(row.dataset.sym, row.dataset.sym);
+  });
+  for (const sym of DEFAULT_WATCHLIST) {
+    try {
+      const snap = await api('/api/market_bar');
+    } catch (_) {}
+  }
+}
+
+async function loadWlAlerts(ticker) {
+  const el = document.getElementById('wl-active-alerts');
+  if (!el) return;
+  try {
+    const data = await api('/api/alerts');
+    const mine = (data.alerts || []).filter(a => a.ticker === ticker);
+    if (!mine.length) { el.innerHTML = ''; return; }
+    el.innerHTML = mine.map(a =>
+      '<div class="wl-alert-chip">' +
+      '<span class="wl-alert-chip-text">' +
+      escapeHtml(a.direction === 'above' ? '↑' : '↓') + ' $' + a.target_price +
+      '</span>' +
+      '<button type="button" class="wl-alert-chip-del tap-feedback" data-alert-id="' +
+      escapeHtml(a.id) + '" aria-label="Remove alert">✕</button>' +
+      '</div>'
+    ).join('');
+    el.querySelectorAll('[data-alert-id]').forEach(btn => {
+      btn.onclick = async () => {
+        await fetch('/api/alerts/' + encodeURIComponent(btn.dataset.alertId), { method: 'DELETE' });
+        loadWlAlerts(ticker);
+      };
+    });
+  } catch (_) {}
+}
+
+async function openWlStockSheet(sym, name) {
+  wlActiveStock = sym.toUpperCase();
+  const sheet = document.getElementById('wl-stock-sheet');
+  document.getElementById('wl-stock-symbol').textContent = wlActiveStock;
+  document.getElementById('wl-stock-name').textContent = name || '';
+  document.getElementById('wl-stock-quote').innerHTML = '<div class="skeleton skeleton-card" style="height:40px"></div>';
+  sheet.classList.remove('hidden');
+
+  try {
+    const bar = await api('/api/market_bar');
+    const item = (bar.items || []).find(i => i.symbol === sym);
+    if (item) {
+      document.getElementById('wl-stock-quote').innerHTML =
+        '<div class="wl-quote-price">' + fmtMoney(item.price) + '</div>' +
+        '<div class="' + plClass(item.change_pct) + '">' + fmtPct(item.change_pct) + '</div>';
+    } else {
+      document.getElementById('wl-stock-quote').innerHTML = '<p class="stat-sub">Quote unavailable</p>';
+    }
+  } catch (_) {
+    document.getElementById('wl-stock-quote').innerHTML = '<p class="stat-sub">Quote unavailable</p>';
+  }
+
+  try {
+    document.getElementById('wl-stock-news-list').innerHTML =
+      '<div class="skeleton skeleton-card" style="height:48px"></div>'.repeat(2);
+    const nData = await api('/api/stocks/' + encodeURIComponent(sym) + '/news?limit=5');
+    const news = nData.news || [];
+    const newsEl = document.getElementById('wl-stock-news-list');
+    if (!news.length) {
+      newsEl.innerHTML = '<p class="stat-sub" style="padding:0.5rem 0">No recent news</p>';
+    } else {
+      newsEl.innerHTML = news.map(n =>
+        '<a class="wl-news-row tap-feedback" href="' + escapeHtml(n.url) + '" target="_blank" rel="noopener">' +
+        '<div class="wl-news-headline">' + escapeHtml(n.headline) + '</div>' +
+        '<div class="wl-news-meta">' + escapeHtml(n.source) + ' · ' + escapeHtml(n.published) + '</div>' +
+        '</a>'
+      ).join('');
+    }
+  } catch (_) {
+    const newsEl = document.getElementById('wl-stock-news-list');
+    if (newsEl) newsEl.innerHTML = '<p class="stat-sub" style="padding:0.5rem 0">News unavailable</p>';
+  }
+
+  loadWlAlerts(sym);
+}
+
+document.getElementById('wl-stock-close').onclick = () => {
+  document.getElementById('wl-stock-sheet').classList.add('hidden');
+};
+
+document.getElementById('wl-buy-btn').onclick = () => {
+  if (wlActiveStock && typeof openOrderSheet === 'function') {
+    openOrderSheet(wlActiveStock, 'buy', 0, wlActiveStock);
+  }
+};
+document.getElementById('wl-sell-btn').onclick = () => {
+  if (wlActiveStock && typeof openOrderSheet === 'function') {
+    openOrderSheet(wlActiveStock, 'sell', 0, wlActiveStock);
+  }
+};
+
+document.getElementById('wl-set-alert-btn').addEventListener('click', async () => {
+  const dir = document.getElementById('wl-alert-dir').value;
+  const price = parseFloat(document.getElementById('wl-alert-price').value) || 0;
+  if (!wlActiveStock || price <= 0) return;
+  try {
+    const res = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker: wlActiveStock, target_price: price, direction: dir }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('wl-alert-price').value = '';
+      loadWlAlerts(wlActiveStock);
+    }
+  } catch (_) {}
+});
+
+loadWatchlist();
+</script>
+{% endblock %}

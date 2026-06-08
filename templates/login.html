@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyTraderHub — Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h1>MyTraderHub</h1>
+    <p class="stat-sub">Paper trading dashboard</p>
+    <form method="POST" action="/login">
+      <button type="submit" class="btn tap-feedback">Enter Dashboard</button>
+    </form>
+  </div>
+</body>
+</html>

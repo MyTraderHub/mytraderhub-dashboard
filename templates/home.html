@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Portfolio</h1>
+</div>
+<div id="home-stats" class="acct-grid">
+  <div class="acct-card"><div class="acct-card-val" id="home-equity">—</div><div class="acct-card-label">Equity</div></div>
+  <div class="acct-card"><div class="acct-card-val" id="home-pl">—</div><div class="acct-card-label">Today P&amp;L</div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(async () => {
+  try {
+    const d = await api('/api/home');
+    document.getElementById('home-equity').textContent = fmtMoney(d.portfolio_value);
+    const plEl = document.getElementById('home-pl');
+    plEl.textContent = fmtMoney(d.daily_pl) + ' (' + fmtPct(d.daily_pl_pct) + ')';
+    plEl.className = 'acct-card-val ' + plClass(d.daily_pl);
+  } catch (_) {}
+})();
+</script>
+{% endblock %}
