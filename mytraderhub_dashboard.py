@@ -120,10 +120,11 @@ def api_orders_place():
 @app.route("/api/stocks/<ticker>/news")
 @require_auth
 def api_stock_news(ticker):
-    ticker = ticker.upper().strip()
-    limit = min(int(request.args.get("limit", 5)), 10)
-    news = de.get_ticker_news(ticker, limit=limit)
-    return jsonify({"ok": True, "ticker": ticker, "news": news})
+    news = de.get_ticker_news(
+        ticker.upper(),
+        limit=min(int(request.args.get("limit", 5)), 10),
+    )
+    return jsonify({"ok": True, "news": news})
 
 
 @app.route("/api/calendar")

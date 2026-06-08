@@ -204,18 +204,16 @@ def get_ticker_news(ticker: str, limit: int = 5) -> list:
         "limit": limit,
         "sort": "desc",
     })
-    if not data:
-        return []
-    items = data if isinstance(data, list) else data.get("news", [])
+    items = data if isinstance(data, list) else (data or {}).get("news", [])
     return [
         {
-            "headline": item.get("headline", ""),
-            "source": item.get("source", ""),
-            "url": item.get("url", ""),
-            "published": (item.get("created_at") or "")[:10],
-            "summary": (item.get("summary") or "")[:180],
+            "headline": i.get("headline", ""),
+            "source": i.get("source", ""),
+            "url": i.get("url", ""),
+            "published": (i.get("created_at") or "")[:10],
+            "summary": (i.get("summary") or "")[:180],
         }
-        for item in items[:limit]
+        for i in (items or [])[:limit]
     ]
 
 

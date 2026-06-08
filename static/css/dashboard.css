@@ -282,7 +282,7 @@ body {
 .wl-quote-price { font-size: 1.5rem; font-weight: 800; }
 .wl-stock-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
 
-.wl-stock-news-wrap { display: flex; flex-direction: column; gap: 0.4rem; margin: 0.75rem 0; }
+.wl-stock-news-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
 .wl-stock-news-label {
   font-size: 0.7rem;
   color: var(--muted);

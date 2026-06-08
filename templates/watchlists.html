@@ -28,10 +28,7 @@
 
     <div class="wl-stock-news-wrap" id="wl-stock-news-wrap">
       <div class="wl-stock-news-label">Latest News</div>
-      <div class="wl-stock-news-list" id="wl-stock-news-list">
-        <div class="skeleton skeleton-card" style="height:48px"></div>
-        <div class="skeleton skeleton-card" style="height:48px"></div>
-      </div>
+      <div id="wl-stock-news-list"><div class="skeleton skeleton-card" style="height:44px"></div></div>
     </div>
 
     <div class="wl-alert-section" id="wl-alert-section">
@@ -132,12 +129,12 @@ async function openWlStockSheet(sym, name) {
 
   try {
     document.getElementById('wl-stock-news-list').innerHTML =
-      '<div class="skeleton skeleton-card" style="height:48px"></div>'.repeat(2);
+      '<div class="skeleton skeleton-card" style="height:44px"></div>';
     const nData = await api('/api/stocks/' + encodeURIComponent(sym) + '/news?limit=5');
     const news = nData.news || [];
     const newsEl = document.getElementById('wl-stock-news-list');
     if (!news.length) {
-      newsEl.innerHTML = '<p class="stat-sub" style="padding:0.5rem 0">No recent news</p>';
+      newsEl.innerHTML = '<p class="stat-sub">No recent news</p>';
     } else {
       newsEl.innerHTML = news.map(n =>
         '<a class="wl-news-row tap-feedback" href="' + escapeHtml(n.url) + '" target="_blank" rel="noopener">' +
@@ -146,10 +143,7 @@ async function openWlStockSheet(sym, name) {
         '</a>'
       ).join('');
     }
-  } catch (_) {
-    const newsEl = document.getElementById('wl-stock-news-list');
-    if (newsEl) newsEl.innerHTML = '<p class="stat-sub" style="padding:0.5rem 0">News unavailable</p>';
-  }
+  } catch (_) {}
 
   loadWlAlerts(sym);
 }
