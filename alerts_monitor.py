@@ -36,9 +36,9 @@ def run_alerts_monitor(stop_event: threading.Event):
                 for alert in triggered:
                     try:
                         import notify_hub as nh
-                        direction = "crossed above" if alert["direction"] == "above" else "dropped below"
-                        msg = (f"Price Alert: {alert['ticker']} {direction} "
-                               f"${alert['target_price']} (now ${alert.get('triggered_price', '?')})")
+                        price = alert.get("triggered_price", "?")
+                        msg = (f"{alert['ticker']} crossed {alert['direction']} "
+                               f"${alert['target_price']} (now ${price})")
                         nh.send_alert(msg)
                         log.info("Alert triggered: %s", msg)
                     except Exception as exc:

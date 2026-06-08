@@ -312,7 +312,7 @@ body {
 }
 .wl-news-meta { font-size: 0.7rem; color: var(--muted); }
 
-.wl-alert-section { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.75rem 0; }
+.wl-alert-section { display: flex; flex-direction: column; gap: 0.5rem; }
 .wl-alert-set-row { display: flex; align-items: center; gap: 0.5rem; }
 .wl-alert-dir {
   background: var(--panel);

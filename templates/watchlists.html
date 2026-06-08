@@ -85,7 +85,8 @@ async function loadWlAlerts(ticker) {
   if (!el) return;
   try {
     const data = await api('/api/alerts');
-    const mine = (data.alerts || []).filter(a => a.ticker === ticker);
+    const sym = (ticker || '').toUpperCase();
+    const mine = (data.alerts || []).filter(a => a.ticker === sym);
     if (!mine.length) { el.innerHTML = ''; return; }
     el.innerHTML = mine.map(a =>
       '<div class="wl-alert-chip">' +

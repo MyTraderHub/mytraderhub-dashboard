@@ -183,10 +183,9 @@ def api_alerts_delete(alert_id):
     return jsonify({"ok": ok})
 
 
-_alerts_stop = threading.Event()
 threading.Thread(
     target=run_alerts_monitor,
-    args=(_alerts_stop,),
+    args=(threading.Event(),),
     daemon=True,
     name="alerts-monitor",
 ).start()
