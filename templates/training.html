@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Training</h1>
+</div>
+
+<div class="tab-row">
+  <button type="button" class="tab-btn active tap-feedback" data-tab="queue">Queue</button>
+  <button type="button" class="tab-btn tap-feedback" data-tab="uploads">Uploads</button>
+</div>
+
+<div id="tab-queue" class="tab-panel">
+  <div class="section">
+    <div class="section-title">Trade Queue</div>
+    <div id="train-queue-list" class="train-queue-list">
+      <div class="skeleton skeleton-card" style="height:64px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-uploads" class="tab-panel hidden">
+  <div class="panel-card">
+    <div class="section-title">Strategy PDF / Text</div>
+    <p class="stat-sub" style="margin-bottom:0.75rem">Upload strategy document text to compile bot enforcement rules.</p>
+    <form id="strategy-upload-form">
+      <input type="file" id="strategy-file" accept=".pdf,.txt,.md" class="stat-sub" style="margin-bottom:0.5rem;width:100%">
+      <textarea id="strategy-text" class="input-textarea" rows="4" placeholder="Or paste strategy text here…"></textarea>
+      <button type="submit" class="btn btn-primary tap-feedback" style="margin-top:0.5rem">Upload &amp; Compile</button>
+    </form>
+  </div>
+
+  <div class="panel-card" style="margin-top:0.75rem">
+    <div class="compiled-rules-head">
+      <div>
+        <div class="section-title">Bot Enforcement Rules</div>
+        <p class="stat-sub">Compiled checks run against each queued trade.</p>
+      </div>
+      <button type="button" class="btn btn-ghost tap-feedback" id="btn-recompile">Recompile</button>
+    </div>
+    <div class="compiled-rules-status" id="compiled-rules-status">
+      <span class="compiled-status-dot" id="compiled-status-dot"></span>
+      <span id="compiled-status-text">Loading…</span>
+    </div>
+    <div class="compiled-rules-list" id="compiled-rules-list"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let activeTab = 'queue';
+
+function switchTab(name) {
+  activeTab = name;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === name);
+  });
+  document.getElementById('tab-queue').classList.toggle('hidden', name !== 'queue');
+  document.getElementById('tab-uploads').classList.toggle('hidden', name !== 'uploads');
+  if (name === 'uploads') loadCompiledRules();
+  if (name === 'queue') loadTrainQueue();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => switchTab(btn.dataset.tab);
+});
+
+async function loadTrainQueue() {
+  const el = document.getElementById('train-queue-list');
+  try {
+    const data = await api('/api/training/queue');
+    renderTrainQueue(data.queue || [], el);
+  } catch (_) {
+    el.innerHTML = '<p class="stat-sub">Unable to load queue</p>';
+  }
+}
+
+async function loadCompiledRules() {
+  const list = document.getElementById('compiled-rules-list');
+  const dot = document.getElementById('compiled-status-dot');
+  const statusText = document.getElementById('compiled-status-text');
+  try {
+    const data = await api('/api/strategy/compiled');
+    const status = data.status || 'idle';
+    dot.className = 'compiled-status-dot' + (status === 'ready' ? ' ready' : status === 'compiling' ? ' compiling' : '');
+    statusText.textContent = status === 'ready'
+      ? 'Rules ready · ' + (data.rules || []).length + ' active checks'
+      : status === 'compiling' ? 'Compiling rules…'
+      : status === 'error' ? (data.error || 'Compile error')
+      : 'No rules compiled yet';
+    const rules = data.rules || [];
+    if (!rules.length) {
+      list.innerHTML = '<p class="stat-sub">Upload a strategy document to generate rules.</p>';
+      return;
+    }
+    list.innerHTML = rules.map(r => {
+      const checked = r.enabled ? ' checked' : '';
+      const muted = r.enabled ? '' : ' muted';
+      return '<div class="compiled-rule-row">' +
+        '<label class="compiled-rule-toggle-wrap">' +
+          '<input type="checkbox" class="compiled-rule-checkbox" data-rule-id="' + escapeHtml(r.id) + '"' + checked + '>' +
+          '<span class="compiled-rule-slider"></span>' +
+        '</label>' +
+        '<span class="compiled-rule-text' + muted + '">' + escapeHtml(r.text) + '</span>' +
+        '<span class="compiled-rule-field">' + escapeHtml(r.field || '') + '</span>' +
+      '</div>';
+    }).join('');
+    list.querySelectorAll('.compiled-rule-checkbox').forEach(cb => {
+      cb.onchange = async () => {
+        await api('/api/strategy/compiled/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rule_id: cb.dataset.ruleId, enabled: cb.checked }),
+        });
+        loadCompiledRules();
+        loadTrainQueue();
+      };
+    });
+    if (status === 'compiling') setTimeout(loadCompiledRules, 2000);
+  } catch (_) {
+    list.innerHTML = '<p class="stat-sub">Unable to load rules</p>';
+  }
+}
+
+document.getElementById('btn-recompile').onclick = async () => {
+  const btn = document.getElementById('btn-recompile');
+  btn.disabled = true;
+  try {
+    await api('/api/strategy/recompile', { method: 'POST' });
+    loadCompiledRules();
+  } catch (_) {}
+  btn.disabled = false;
+};
+
+document.getElementById('strategy-upload-form').onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData();
+  const file = document.getElementById('strategy-file').files[0];
+  const text = document.getElementById('strategy-text').value.trim();
+  if (file) fd.append('file', file);
+  if (text) fd.append('text', text);
+  try {
+    const res = await fetch('/api/training/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'upload failed');
+    switchTab('uploads');
+    loadCompiledRules();
+  } catch (err) {
+    alert(err.message || 'Upload failed');
+  }
+};
+
+loadTrainQueue();
+setupPullToRefresh(() => {
+  if (activeTab === 'queue') loadTrainQueue();
+  else loadCompiledRules();
+});
+</script>
+{% endblock %}

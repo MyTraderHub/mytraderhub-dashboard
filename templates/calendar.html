@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page-header">
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
   <h1 class="page-title">Trade Journal</h1>
+  <a href="/api/calendar/export" class="btn btn-ghost tap-feedback" style="font-size:0.72rem;padding:0.35rem 0.6rem">Export CSV</a>
 </div>
 
 <div class="cal-header">
@@ -100,9 +101,17 @@ function renderGrid(data) {
     if (info) {
       inner += '<div class="cal-dot ' + escapeHtml(info.outcome || 'pending') + '"></div>';
       const pl = info.pl_sum || 0;
-      const plCls = pl >= 0 ? 'pos' : 'neg';
-      const sign = pl >= 0 ? '+' : '';
-      inner += '<div class="cal-pl ' + plCls + '">' + sign + pl.toFixed(1) + 'R</div>';
+      if (pl !== 0) {
+        const plCls = pl >= 0 ? 'pos' : 'neg';
+        const sign = pl >= 0 ? '+' : '';
+        inner += '<div class="cal-pl ' + plCls + '">' + sign + pl.toFixed(1) + 'R</div>';
+      }
+      const upl = info.unrealized_pl || 0;
+      if (info.has_open && upl !== 0) {
+        const uplCls = upl >= 0 ? 'pos' : 'neg';
+        const uplSign = upl >= 0 ? '+' : '';
+        inner += '<div class="cal-pl unrealized ' + uplCls + '">' + uplSign + fmtMoney(Math.abs(upl)) + '</div>';
+      }
     }
     return '<div class="' + cls + '" data-date="' + escapeHtml(c.key) + '"' +
       (info ? ' role="button" tabindex="0"' : '') + '>' + inner + '</div>';
@@ -163,12 +172,16 @@ async function openDaySheet(dateStr) {
       const rm = parseFloat(t.r_multiple || 0);
       const entry = t.entry_price != null ? '$' + parseFloat(t.entry_price).toFixed(2) : '—';
       const exit = t.exit_price != null ? '$' + parseFloat(t.exit_price).toFixed(2) : '—';
+      const upl = t.unrealized_pl != null ? parseFloat(t.unrealized_pl) : null;
+      const uplHtml = upl != null
+        ? ' <span class="badge ' + plClass(upl) + '">' + (upl >= 0 ? '+' : '') + fmtMoney(upl) + ' unrealized</span>'
+        : '';
       return '<div class="order-row order-row-compact">' +
         '<div>' +
         '<span class="order-ticker">' + escapeHtml(t.ticker || '') + '</span> ' +
         (t.grade ? '<span class="badge">' + escapeHtml(t.grade) + '</span> ' : '') +
         '<span class="' + oc + '">' + escapeHtml(outcome.toUpperCase()) + '</span> ' +
-        '<span class="badge">' + (rm >= 0 ? '+' : '') + rm.toFixed(1) + 'R</span>' +
+        (t.is_open ? uplHtml : '<span class="badge">' + (rm >= 0 ? '+' : '') + rm.toFixed(1) + 'R</span>') +
         '<div class="stat-sub">' + entry + ' → ' + exit + '</div>' +
         (t.setup_type ? '<div class="stat-sub">' + escapeHtml(t.setup_type) + '</div>' : '') +
         '</div></div>';

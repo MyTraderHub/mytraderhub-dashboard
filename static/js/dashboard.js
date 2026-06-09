@@ -82,6 +82,45 @@ async function loadMarketBar() {
   }
 }
 
+function renderTrainQueue(queue, container) {
+  const el = container || document.getElementById('train-queue-list');
+  if (!el) return;
+  if (!queue.length) {
+    el.innerHTML = '<p class="stat-sub">No trades in queue</p>';
+    return;
+  }
+  el.innerHTML = queue.map(item => {
+    const ticker = escapeHtml(item.ticker || item.symbol || '—');
+    const side = escapeHtml((item.side || '').toUpperCase());
+    const entry = item.entry_price != null ? fmtMoney(item.entry_price) : '—';
+    const stop = item.stop_loss != null ? fmtMoney(item.stop_loss) : '—';
+    const target = item.target != null ? fmtMoney(item.target) : '—';
+    const levels = '<div class="train-levels">' +
+      '<span>Entry ' + entry + '</span>' +
+      '<span>Stop ' + stop + '</span>' +
+      '<span>Target ' + target + '</span>' +
+    '</div>';
+
+    const violations = item.violations || [];
+    const violationHtml = violations.length
+      ? '<div class="train-violations">' +
+          violations.map(v => '<span class="train-violation-chip">⚠ ' + escapeHtml(v) + '</span>').join('') +
+        '</div>'
+      : '';
+
+    const cardCls = 'train-queue-card' + (violations.length ? ' has-violations' : '');
+    return '<div class="' + cardCls + '">' +
+      '<div class="train-card-head">' +
+        '<span class="order-ticker">' + ticker + '</span>' +
+        '<span class="badge">' + side + '</span>' +
+      '</div>' +
+      levels +
+      violationHtml +
+      (item.setup_type ? '<div class="stat-sub">' + escapeHtml(item.setup_type) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadMarketBar();
   setInterval(loadMarketBar, 60000);

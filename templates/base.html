@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>MyTraderHub</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=116">
 </head>
 <body>
   <div id="market-bar" class="market-bar">
@@ -37,7 +37,7 @@
 
   <div id="order-sheet" class="sheet hidden"></div>
 
-  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=116"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
