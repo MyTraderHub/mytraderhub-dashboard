@@ -5,9 +5,10 @@ import threading
 from datetime import datetime
 from functools import wraps
 
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, jsonify, redirect, render_template, request, session, url_for
 
 import dashboard_engine as de
+import strategy_compiler as sc
 from alerts_monitor import run_alerts_monitor
 
 logging.basicConfig(level=logging.INFO)
@@ -59,6 +60,12 @@ def account_page():
 @require_auth
 def page_calendar():
     return render_template("calendar.html", page="calendar")
+
+
+@app.route("/training")
+@require_auth
+def page_training():
+    return render_template("training.html", page="training")
 
 
 @app.route("/api/account")
@@ -181,6 +188,76 @@ def api_alerts_delete(alert_id):
     user_id = session.get("tg_user_id", "default")
     ok = de.delete_alert(alert_id, user_id=user_id)
     return jsonify({"ok": ok})
+
+
+@app.route("/api/strategy/compiled")
+@require_auth
+def api_strategy_compiled():
+    user_id = session.get("tg_user_id", "default")
+    return jsonify({"ok": True, **sc.get_compiled_rules(user_id=user_id)})
+
+
+@app.route("/api/strategy/compiled/toggle", methods=["POST"])
+@require_auth
+def api_strategy_compiled_toggle():
+    body = request.get_json(silent=True) or {}
+    rule_id = (body.get("rule_id") or body.get("id") or "").strip()
+    enabled = bool(body.get("enabled", True))
+    if not rule_id:
+        return jsonify({"ok": False, "error": "rule_id required"}), 400
+    user_id = session.get("tg_user_id", "default")
+    return jsonify(sc.toggle_rule(rule_id, enabled, user_id=user_id))
+
+
+@app.route("/api/strategy/recompile", methods=["POST"])
+@require_auth
+def api_strategy_recompile():
+    user_id = session.get("tg_user_id", "default")
+    text = de.get_strategy_text(user_id=user_id)
+    if not text.strip():
+        return jsonify({"ok": False, "error": "no strategy text on file"}), 400
+    return jsonify(sc.trigger_compile_async(text, user_id=user_id))
+
+
+@app.route("/api/training/queue")
+@require_auth
+def api_training_queue():
+    user_id = session.get("tg_user_id", "default")
+    queue = de.get_training_queue(user_id=user_id)
+    for item in queue:
+        item["violations"] = sc.run_checks(item, user_id=user_id)
+    return jsonify({"ok": True, "queue": queue})
+
+
+@app.route("/api/training/upload", methods=["POST"])
+@require_auth
+def api_training_upload():
+    user_id = session.get("tg_user_id", "default")
+    text = (request.form.get("text") or "").strip()
+    filename = (request.form.get("filename") or "strategy.txt").strip()
+    if not text and request.files.get("file"):
+        raw = request.files["file"].read()
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            text = raw.decode("latin-1", errors="ignore")
+        filename = request.files["file"].filename or filename
+    if not text:
+        return jsonify({"ok": False, "error": "strategy text required"}), 400
+    result = de._register_strategy_pdf_file(filename, text, user_id=user_id)
+    return jsonify(result)
+
+
+@app.route("/api/calendar/export")
+@require_auth
+def api_calendar_export():
+    user_id = session.get("tg_user_id", "default")
+    csv_body = de.export_trades_csv(user_id=user_id)
+    return Response(
+        csv_body,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=trades_export.csv"},
+    )
 
 
 threading.Thread(

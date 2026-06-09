@@ -506,3 +506,79 @@ body {
   letter-spacing: 0.04em;
   margin-top: 0.2rem;
 }
+
+.tab-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.tab-btn {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tab-btn.active {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(0,196,255,0.08);
+}
+.input-textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  resize: vertical;
+}
+.train-queue-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.train-queue-card {
+  background: var(--panel);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+}
+.train-card-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+.train-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.cal-pl.unrealized { font-size: 0.55rem; margin-top: 1px; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Compiled strategy rules */
+.compiled-rules-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem; }
+.compiled-rules-status { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; font-size:0.72rem; color:var(--muted); }
+.compiled-status-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+.compiled-status-dot.ready { background:var(--green); }
+.compiled-status-dot.compiling { background:var(--orange); animation: pulse 1s infinite; }
+.compiled-rules-list { display:flex; flex-direction:column; gap:0.5rem; }
+.compiled-rule-row { display:flex; align-items:center; gap:0.65rem; padding:0.55rem 0; border-bottom:1px solid var(--border); }
+.compiled-rule-toggle-wrap { position:relative; display:inline-block; width:36px; height:20px; flex-shrink:0; }
+.compiled-rule-checkbox { opacity:0; width:0; height:0; position:absolute; }
+.compiled-rule-slider { position:absolute; cursor:pointer; inset:0; background:var(--dim); border-radius:20px; transition:0.2s; }
+.compiled-rule-checkbox:checked + .compiled-rule-slider { background:var(--green); }
+.compiled-rule-slider:before { content:""; position:absolute; width:14px; height:14px; left:3px; bottom:3px; background:white; border-radius:50%; transition:0.2s; }
+.compiled-rule-checkbox:checked + .compiled-rule-slider:before { transform:translateX(16px); }
+.compiled-rule-text { flex:1; font-size:0.78rem; }
+.compiled-rule-text.muted { color:var(--muted); }
+.compiled-rule-field { font-size:0.62rem; color:var(--muted); background:var(--dim); padding:0.15rem 0.4rem; border-radius:4px; }
+
+/* Trade card violation chips */
+.train-violations { display:flex; flex-wrap:wrap; gap:0.3rem; margin:0.35rem 0 0; }
+.train-violation-chip { font-size:0.65rem; background:rgba(255,61,61,0.12); color:var(--red); border:1px solid rgba(255,61,61,0.25); border-radius:4px; padding:0.15rem 0.4rem; }
+.train-queue-card.has-violations { border-left:2px solid var(--red); }
