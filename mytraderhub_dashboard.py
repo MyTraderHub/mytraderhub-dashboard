@@ -8,6 +8,7 @@ from functools import wraps
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 import dashboard_engine as de
+from ai_support import chat as ai_chat
 from alerts_monitor import run_alerts_monitor
 
 logging.basicConfig(level=logging.INFO)
@@ -59,6 +60,12 @@ def account_page():
 @require_auth
 def page_calendar():
     return render_template("calendar.html", page="calendar")
+
+
+@app.route("/settings")
+@require_auth
+def page_settings():
+    return render_template("settings.html", page="settings")
 
 
 @app.route("/api/account")
@@ -181,6 +188,35 @@ def api_alerts_delete(alert_id):
     user_id = session.get("tg_user_id", "default")
     ok = de.delete_alert(alert_id, user_id=user_id)
     return jsonify({"ok": ok})
+
+
+@app.route("/api/plan")
+@require_auth
+def api_plan():
+    user_id = session.get("tg_user_id", "default")
+    return jsonify({"ok": True, **de.get_plan_usage(user_id=user_id)})
+
+
+@app.route("/api/support/chat", methods=["POST"])
+@require_auth
+def api_support_chat():
+    body = request.get_json(silent=True) or {}
+    message = (body.get("message") or "").strip()
+    history = body.get("history") or []
+    if not message:
+        return jsonify({"ok": False, "error": "message required"}), 400
+    user_id = session.get("tg_user_id", "default")
+    usage = de.get_plan_usage(user_id=user_id)
+    chat_metric = next((m for m in usage["metrics"] if m["key"] == "ai_chats"), None)
+    if chat_metric and chat_metric["used"] >= chat_metric["limit"]:
+        return jsonify({
+            "ok": False,
+            "error": "AI chat limit reached for your plan. Upgrade in Settings → Plan & Usage.",
+        }), 429
+    result = ai_chat(message, history=history)
+    if result.get("ok"):
+        de.increment_usage(user_id, "ai_chats")
+    return jsonify(result)
 
 
 threading.Thread(

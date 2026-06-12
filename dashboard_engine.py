@@ -374,6 +374,92 @@ def get_market_bar() -> list:
     return results
 
 
+USAGE_FILE = "data/usage.json"
+
+PLAN_LIMITS = {
+    "free": {
+        "label": "Free",
+        "ai_chats": 25,
+        "price_alerts": 10,
+        "ai_analyses": 15,
+        "watchlist_tickers": 20,
+    },
+    "pro": {
+        "label": "Pro",
+        "ai_chats": 500,
+        "price_alerts": 100,
+        "ai_analyses": 200,
+        "watchlist_tickers": 100,
+    },
+}
+
+
+def _load_usage(user_id: str) -> dict:
+    all_usage = _read_json(USAGE_FILE, {})
+    return all_usage.get(user_id, {
+        "plan": "free",
+        "ai_chats": 0,
+        "price_alerts": 0,
+        "ai_analyses": 0,
+        "watchlist_tickers": 0,
+    })
+
+
+def _save_usage(user_id: str, usage: dict) -> None:
+    all_usage = _read_json(USAGE_FILE, {})
+    all_usage[user_id] = usage
+    _write_json(USAGE_FILE, all_usage)
+
+
+def get_plan_usage(user_id: str = "default") -> dict:
+    usage = _load_usage(user_id)
+    plan_key = usage.get("plan", "free")
+    limits = PLAN_LIMITS.get(plan_key, PLAN_LIMITS["free"])
+    alert_count = len(get_alerts(user_id=user_id))
+
+    metrics = [
+        {
+            "key": "ai_chats",
+            "label": "AI Chats",
+            "used": int(usage.get("ai_chats", 0)),
+            "limit": limits["ai_chats"],
+        },
+        {
+            "key": "ai_analyses",
+            "label": "AI Analyses",
+            "used": int(usage.get("ai_analyses", 0)),
+            "limit": limits["ai_analyses"],
+        },
+        {
+            "key": "price_alerts",
+            "label": "Price Alerts",
+            "used": alert_count,
+            "limit": limits["price_alerts"],
+        },
+        {
+            "key": "watchlist_tickers",
+            "label": "Watchlist",
+            "used": int(usage.get("watchlist_tickers", 0)),
+            "limit": limits["watchlist_tickers"],
+        },
+    ]
+    for m in metrics:
+        m["pct"] = round(min(m["used"] / m["limit"], 1) * 100, 1) if m["limit"] else 0
+
+    return {
+        "plan": plan_key,
+        "plan_label": limits["label"],
+        "renewal": "Monthly",
+        "metrics": metrics,
+    }
+
+
+def increment_usage(user_id: str, key: str, amount: int = 1) -> None:
+    usage = _load_usage(user_id)
+    usage[key] = int(usage.get(key, 0)) + amount
+    _save_usage(user_id, usage)
+
+
 def place_simple_order(symbol: str, side: str, qty: float, order_type: str = "market",
                        limit_price: float | None = None) -> dict:
     payload = {
