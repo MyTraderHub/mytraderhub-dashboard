@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header settings-header">
+  <h1 class="page-title">Settings</h1>
+  <p class="page-subtitle">Plan, help, and AI support</p>
+</div>
+
+<section class="settings-section" aria-labelledby="plan-heading">
+  <h2 class="section-title" id="plan-heading">Plan &amp; Usage</h2>
+  <div class="panel-card plan-usage-card" id="plan-usage-card">
+    <div class="plan-usage-top">
+      <div class="plan-usage-plan">
+        <span class="plan-badge" id="plan-badge">—</span>
+        <span class="plan-renewal stat-sub" id="plan-renewal">—</span>
+      </div>
+    </div>
+    <div class="plan-usage-grid" id="plan-usage-grid">
+      <div class="skeleton skeleton-card plan-usage-skeleton"></div>
+      <div class="skeleton skeleton-card plan-usage-skeleton"></div>
+      <div class="skeleton skeleton-card plan-usage-skeleton"></div>
+      <div class="skeleton skeleton-card plan-usage-skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<section class="settings-section" aria-labelledby="help-heading">
+  <h2 class="section-title" id="help-heading">Help &amp; Support</h2>
+  <div class="help-accordion-list">
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Getting Started</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>Sign in with your user id, then explore Home for portfolio equity and daily P&amp;L.</p>
+        <p>Use <strong>Watch</strong> to search tickers, <strong>Account</strong> for orders, and <strong>Journal</strong> for your trade calendar.</p>
+      </div>
+    </details>
+
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Watchlist &amp; Quotes</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>Search any ticker on the Watch page. Tap a row to open quotes, latest news, and price alerts.</p>
+        <p>Buy and Sell buttons open the order sheet for quick paper trades.</p>
+      </div>
+    </details>
+
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Price Alerts</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>From a stock sheet, choose <em>Above</em> or <em>Below</em>, enter a target price, and tap <strong>Set</strong>.</p>
+        <p>Active alerts appear as chips. Delete with the × on each chip. Limits depend on your plan.</p>
+      </div>
+    </details>
+
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Orders &amp; Account</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>The Account page shows portfolio value, cash, buying power, and day-trade status.</p>
+        <p>Cancel open orders from the table. Order history lists filled and cancelled trades.</p>
+      </div>
+    </details>
+
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Trade Journal</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>The Journal calendar colors each day by outcome. Tap a day with trades for details.</p>
+        <p>Monthly win rate and P&amp;L summary appear below the grid.</p>
+      </div>
+    </details>
+
+    <details class="help-accordion">
+      <summary class="help-accordion-summary">
+        <span>Billing &amp; Plans</span>
+        <span class="help-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="help-accordion-body">
+        <p>Free includes limited AI chats, alerts, and analyses. Pro raises all limits.</p>
+        <p>Usage meters above reset monthly. Contact support via the AI assistant below for upgrade help.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="settings-section" aria-labelledby="chat-heading">
+  <h2 class="section-title" id="chat-heading">AI Support Chat</h2>
+  <div class="panel-card ai-chat-card" id="ai-chat-card">
+    <div class="ai-chat-header">
+      <div class="ai-chat-avatar" aria-hidden="true">AI</div>
+      <div>
+        <div class="ai-chat-title">MyTraderHub Assistant</div>
+        <div class="ai-chat-status stat-sub">Ask about features, alerts, or your account</div>
+      </div>
+    </div>
+    <div class="ai-chat-messages" id="ai-chat-messages" role="log" aria-live="polite">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-msg-bubble">Hi! I'm your trading dashboard assistant. How can I help today?</div>
+      </div>
+    </div>
+    <form class="ai-chat-form" id="ai-chat-form">
+      <input type="text" class="ai-chat-input" id="ai-chat-input"
+             placeholder="Type your question…" autocomplete="off" maxlength="500"
+             aria-label="Message to AI support">
+      <button type="submit" class="btn btn-sm ai-chat-send tap-feedback" id="ai-chat-send">Send</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
