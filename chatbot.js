@@ -9,8 +9,8 @@
     { label: 'What does AltusFlow do?', intent: 'overview' },
     { label: 'AI-powered websites', intent: 'websites' },
     { label: 'Meta ads & funnels', intent: 'ads' },
-    { label: 'Lead sourcing', intent: 'outbound' },
-    { label: 'How does it work?', intent: 'process' },
+    { label: 'Lead sourcing', intent: 'lead_sourcing_specialist' },
+    { label: 'Ideal client profile', intent: 'icp' },
     { label: 'Book a strategy call', intent: 'contact' },
   ];
 
@@ -168,12 +168,61 @@ High-value businesses where **one booked call = significant revenue** — and lo
 
 Does that sound like you? Tell me your industry and I'll share what's most relevant.`,
 
+    icp: `**AltusFlow Ideal Client Profile (ICP)**
+
+**Industry:** B2B professional services, agencies, consulting, B2B SaaS, financial advisory, IT services
+
+**Company size:**
+• Revenue: $2M–$100M (sweet spot: $5M–$30M)
+• Employees: 10–500
+• Marketing spend: $3,000+/month
+
+**Decision-makers we target:**
+• Founder / CEO
+• CMO / VP Marketing
+• Head of Growth
+• VP Sales
+
+**Top pain signals (need 2+):**
+• Leaky bucket — traffic without conversion
+• Passive website, no 24/7 chat
+• After-hours missed leads
+• Low ad ROI / high CPC, few booked calls
+• SDRs spending 10+ hrs/week on manual research
+
+**We exclude:** Direct competitors, sub-10-employee shops (unless high ACV), low-ticket e-commerce, unverified contacts.
+
+Sound like your company? <a href="#contact" class="chat-cta-link">Let's map your gaps →</a>`,
+
+    lead_sourcing_specialist: `**How AltusFlow's Outbound Hunter sources leads**
+
+Our lead sourcing engine follows a strict, accuracy-first workflow:
+
+**1. Research** — Scans LinkedIn, X/Twitter, company sites, Google News, and job postings for ICP-aligned prospects showing intent signals.
+
+**2. Qualify** — Every lead must pass ALL criteria:
+• Revenue >$2M OR marketing spend >$3k/mo
+• Decision-maker is Founder, C-level, or VP
+• Active on social in last 30 days OR recent trigger (funding, hire, launch)
+• Verified LinkedIn/website — no generic unverified contacts
+
+**3. Personalize** — Each qualified lead gets a 1-sentence hook tied to a real trigger:
+• "Posted about lead gen struggles last week…"
+• "Just hired an SDR — our intent engine replaces manual research…"
+• "Running Meta ads but site has no chat — we plug that leak…"
+
+**4. Output** — Clean table: Company, Decision Maker, Title, URL, Personalization Hook. Borderline leads flagged in "Review Needed" — never fabricated.
+
+**This is what we build for clients** — not just for ourselves. Want this running for your pipeline?
+
+<a href="#contact" class="chat-cta-link">→ Start your systems analysis</a>`,
+
     greeting: `Hey! 👋 I'm the AltusFlow AI assistant — here to help you understand how we plug revenue leaks and build automated growth engines.
 
 **I can help with:**
 • Our 3 core systems (websites, ads, outbound)
-• How everything integrates
-• Whether we're a fit for your business
+• How intent-based lead sourcing works
+• Whether you're a fit (ICP criteria)
 • Getting you to a strategy call
 
 What would you like to know?`,
@@ -200,11 +249,13 @@ Could you rephrase, or tap one of the quick buttons below? For a detailed answer
     { intent: 'pricing', patterns: [/pric(e|ing)|cost|how much|budget|invest|afford|package|plan/i, /\$\d/] },
     { intent: 'websites', patterns: [/website|web\s*site|chatbot|chat\s*bot|ai\s*chat|conversion engine|landing page|storefront|brochure/i, /missing chatbot/i, /outdated website/i] },
     { intent: 'ads', patterns: [/meta|facebook|instagram|ad[s]?|funnel|inbound|ppc|campaign|click/i, /low ad conversion/i, /burning cash/i] },
-    { intent: 'outbound', patterns: [/outbound|lead sourc|linkedin|sdr|prospect|outreach|cold email|social network|hunter/i, /wasting time on research/i, /research/i] },
+    { intent: 'outbound', patterns: [/outbound|linkedin|sdr|prospect|outreach|cold email|social network|hunter/i, /wasting time on research/i] },
+    { intent: 'lead_sourcing_specialist', patterns: [/lead sourc|find leads|source leads|personalization hook|decision.?maker|trigger event/i, /how do you find/i, /lead table/i] },
+    { intent: 'icp', patterns: [/ideal customer|ideal client|\bicp\b|target (audience|market)|who is (this|it) for|good fit|company size/i, /fit for me|qualif(y|ication) criteria/i] },
     { intent: 'integration', patterns: [/integrat|connect|work together|pipeline|ecosystem|unfair advantage|autonomous|24\/7|background/i, /three system|3 vertical|all three/i] },
     { intent: 'process', patterns: [/how (does|do) it work|how long|timeline|process|step|onboard|get started|what happens/i, /how does altusflow/i] },
     { intent: 'problem', patterns: [/leaky bucket|leak|losing (revenue|deal|lead)|problem|bottleneck|challenge|struggle/i, /why.*not convert/i] },
-    { intent: 'who', patterns: [/who is this for|fit for|right for|industr|b2b|saas|agency|consult/i, /do you work with/i] },
+    { intent: 'who', patterns: [/industr|b2b|saas|agency|consult/i, /do you work with/i, /right for me/i] },
     { intent: 'overview', patterns: [/what (is|does) altusflow|tell me about|what do you (do|offer)|services|about you|who are you/i, /^help$/i] },
   ];
 
