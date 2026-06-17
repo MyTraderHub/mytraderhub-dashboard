@@ -184,6 +184,73 @@
     .icon-glow {
       transition: background 0.3s ease, color 0.3s ease;
     }
+
+    /* ── Chat panel ── */
+    #chat-panel {
+      transform-origin: bottom right;
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #chat-panel.hidden {
+      opacity: 0;
+      transform: scale(0.95) translateY(8px);
+      pointer-events: none;
+    }
+
+    #chat-panel.chat-panel-open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    #chat-messages {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
+    }
+
+    #chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+
+    .chat-typing-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #818cf8;
+      animation: chat-bounce 0.6s ease-in-out infinite;
+    }
+
+    @keyframes chat-bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.4; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .chat-cta-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: #818cf8;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .chat-cta-link:hover {
+      color: #a5b4fc;
+      text-decoration: underline;
+    }
+
+    #chat-quick-actions {
+      scrollbar-width: none;
+    }
+
+    #chat-quick-actions::-webkit-scrollbar {
+      display: none;
+    }
   </style>
 </head>
 
@@ -483,21 +550,90 @@
   </footer>
 
   <!-- ============================================================
-       FLOATING AI CHAT WIDGET PLACEHOLDER
-       Theme plugins / chat integrations attach here.
+       AI CHAT ASSISTANT WIDGET
        ============================================================ -->
+
+  <!-- Chat panel -->
   <div
-    id="ai-chat-widget-placeholder"
-    data-widget="ai-chatbot"
-    role="complementary"
+    id="chat-panel"
+    class="hidden fixed bottom-8 right-8 z-50 flex w-[calc(100vw-2rem)] max-w-md flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111111]/95 shadow-2xl shadow-black/50 backdrop-blur-xl sm:w-[400px]"
+    role="dialog"
     aria-label="AI Chat Assistant"
-    class="chat-widget btn-primary fixed bottom-8 right-8 z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full text-white"
+    aria-modal="true"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-accent/20">
+          <svg class="h-4 w-4 text-accent-light" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-white">AltusFlow Assistant</p>
+          <p class="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+            Online — replies instantly
+          </p>
+        </div>
+      </div>
+      <button
+        id="chat-close"
+        type="button"
+        class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-white/[0.06] hover:text-white"
+        aria-label="Close chat"
+      >
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div id="chat-messages" class="flex-1 space-y-4 overflow-y-auto px-4 py-4" style="height: 340px;" aria-live="polite"></div>
+
+    <!-- Quick actions -->
+    <div id="chat-quick-actions" class="flex gap-2 overflow-x-auto border-t border-white/[0.04] px-4 py-3"></div>
+
+    <!-- Input -->
+    <div class="border-t border-white/[0.06] px-4 py-3">
+      <div class="flex items-end gap-2">
+        <textarea
+          id="chat-input"
+          rows="1"
+          placeholder="Ask about websites, ads, outbound..."
+          class="input-dark max-h-24 min-h-[44px] flex-1 resize-none rounded-xl px-4 py-3 text-sm leading-relaxed"
+          aria-label="Chat message"
+        ></textarea>
+        <button
+          id="chat-send"
+          type="button"
+          disabled
+          class="btn-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl disabled:opacity-40 disabled:hover:transform-none"
+          aria-label="Send message"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat toggle button -->
+  <button
+    id="chat-toggle"
+    type="button"
+    data-widget="ai-chatbot"
+    aria-label="Open AI Chat Assistant"
+    class="chat-widget btn-primary fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white"
   >
     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
     </svg>
-    <span class="sr-only">Open AI Chat Assistant</span>
-  </div>
+  </button>
+
+  <script src="chatbot.js"></script>
 
 </body>
 </html>
