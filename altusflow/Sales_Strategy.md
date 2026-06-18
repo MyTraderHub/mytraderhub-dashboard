@@ -1,6 +1,6 @@
 # AltusFlow.ai — Sales Strategy
 
-> Companion to `ICP_Guidelines.md`. Defines positioning, messaging, and conversion paths.
+> Companion to `altusflow/ICP_Guidelines.md`. Defines positioning, messaging, and conversion paths.
 
 ---
 
