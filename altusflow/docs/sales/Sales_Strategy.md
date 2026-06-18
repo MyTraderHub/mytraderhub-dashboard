@@ -1,6 +1,6 @@
 # AltusFlow.ai — Sales Strategy
 
-> Companion to `altusflow/ICP_Guidelines.md`. Defines positioning, messaging, and conversion paths.
+> Companion to `docs/sales/ICP_Guidelines.md`. Defines positioning, messaging, and conversion paths.
 
 ---
 
@@ -35,7 +35,7 @@
 
 | Stage | Action |
 |-------|--------|
-| **1. Identify** | Intent-based sourcing per `ICP_Guidelines.md` — LinkedIn, social, news, job posts |
+| **1. Identify** | Intent-based sourcing per `docs/sales/ICP_Guidelines.md` — LinkedIn, social, news, job posts |
 | **2. Personalize** | 1-sentence hook tied to a specific trigger (funding, post, hire, pain signal) |
 | **3. Outreach** | Hyper-personalized pitch drafted for executive review; human approves before send |
 | **4. Convert** | Book strategy call → "Identify Your Revenue Gaps" intake → tailored systems analysis |

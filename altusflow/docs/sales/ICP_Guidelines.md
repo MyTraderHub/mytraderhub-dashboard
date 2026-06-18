@@ -1,7 +1,7 @@
 # AltusFlow.ai — Ideal Customer Profile (ICP) Guidelines
 
 > Reference this file for all lead sourcing, outbound, and sales qualification decisions.  
-> See also: `altusflow/Sales_Strategy.md`
+> See also: `docs/sales/Sales_Strategy.md`
 
 ## Company Overview
 

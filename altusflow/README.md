@@ -1,35 +1,79 @@
-# AltusFlow.ai
+# AltusFlow.ai — Project Index
 
-Landing page and sales tooling for **AltusFlow.ai** — automated growth engines for high-value B2B businesses.
+**Start here.** This folder contains the landing page, chatbot, and sales docs for AltusFlow.ai.
 
-## Project structure
+> These files belong in your **`AltusFlow-ai/AltusFlow.ai`** repository — not in MyTraderHub. Copy or merge this entire `altusflow/` folder into your local AltusFlow repo.
+
+---
+
+## Where to find everything
+
+| What you need | Path |
+|---------------|------|
+| **Landing page** | `website/index.html` |
+| **Chat assistant** | `website/chatbot.js` |
+| **ICP & qualification rules** | `docs/sales/ICP_Guidelines.md` |
+| **Sales positioning & objections** | `docs/sales/Sales_Strategy.md` |
+| **Lead sourcing agent prompt** | `docs/prompts/lead-sourcing-specialist.md` |
+
+---
+
+## Folder layout
 
 ```
-altusflow/
-├── index.html                        # Landing page
-├── chatbot.js                        # Native AI chat assistant
-├── ICP_Guidelines.md                 # Ideal customer profile
-├── Sales_Strategy.md                 # Positioning & sales motion
-└── prompts/
-    └── lead-sourcing-specialist.md   # Lead sourcing agent prompt
+altusflow/                          ← merge this into your AltusFlow repo
+├── README.md                       ← this file (project index)
+├── website/
+│   ├── index.html                  ← open in browser to preview
+│   └── chatbot.js
+└── docs/
+    ├── sales/
+    │   ├── ICP_Guidelines.md
+    │   └── Sales_Strategy.md
+    └── prompts/
+        └── lead-sourcing-specialist.md
 ```
 
-## Preview locally
+If your AltusFlow repo already has other docs, place this alongside them:
 
-From the repository root:
+```
+your-altusflow-repo/
+├── website/          ← landing page lives here
+├── docs/
+│   ├── sales/        ← ICP + strategy (add next to your other docs)
+│   └── prompts/
+└── ...your other docs...
+```
+
+---
+
+## Preview the website
+
+From your repo root:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Open: http://localhost:8080/altusflow/index.html
+Open: **http://localhost:8080/website/index.html**  
+(if merged at repo root)
+
+Or: **http://localhost:8080/altusflow/website/index.html**  
+(if still inside mytraderhub-dashboard during transition)
+
+---
 
 ## Cursor references
 
-When running lead sourcing or sales workflows in Cursor:
+```
+@website/index.html
+@docs/sales/ICP_Guidelines.md
+@docs/sales/Sales_Strategy.md
+@docs/prompts/lead-sourcing-specialist.md
+```
 
-```
-@altusflow/prompts/lead-sourcing-specialist.md
-@altusflow/ICP_Guidelines.md
-@altusflow/Sales_Strategy.md
-```
+---
+
+## Move to your AltusFlow repository
+
+See `MOVE_TO_ALTUSFLOW_REPO.md` for step-by-step instructions.
