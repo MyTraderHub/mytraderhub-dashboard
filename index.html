@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus AI — Triple Threat Growth Ecosystem</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#0a0a0f',
+            surface: '#12121a',
+            muted: '#8b8b9e',
+            accent: '#6366f1',
+            glow: '#818cf8',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .hero-gradient {
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.25), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(129, 140, 248, 0.12), transparent),
+        #0a0a0f;
+    }
+    .card-glow:hover {
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3), 0 8px 32px rgba(99, 102, 241, 0.08);
+    }
+    .chat-panel {
+      transform-origin: bottom right;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .chat-panel.hidden-panel {
+      opacity: 0;
+      transform: scale(0.95) translateY(8px);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-ink text-white font-sans antialiased">
+
+  <!-- ============================================================
+       SITE HEADER — Primary navigation and brand identity
+       ============================================================ -->
+  <header class="fixed top-0 inset-x-0 z-40 border-b border-white/5 bg-ink/80 backdrop-blur-lg">
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between" aria-label="Main navigation">
+      <a href="#" class="flex items-center gap-2 font-bold text-lg tracking-tight">
+        <span class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm">N</span>
+        Nexus AI
+      </a>
+      <div class="hidden sm:flex items-center gap-8 text-sm text-muted">
+        <a href="#problem" class="hover:text-white transition-colors">The Problem</a>
+        <a href="#verticals" class="hover:text-white transition-colors">Triple Threat</a>
+        <a href="#proof" class="hover:text-white transition-colors">Our Edge</a>
+        <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+      </div>
+      <a href="#contact" class="text-sm font-medium bg-accent hover:bg-indigo-500 px-4 py-2 rounded-lg transition-colors">
+        Fix Your Leaky Bucket
+      </a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ============================================================
+         HERO SECTION — Primary value proposition and CTAs
+         ============================================================ -->
+    <section id="hero" class="hero-gradient min-h-screen flex items-center pt-16" aria-labelledby="hero-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-20 lg:py-28">
+        <div class="max-w-4xl">
+          <p class="inline-flex items-center gap-2 text-sm font-medium text-glow bg-accent/10 border border-accent/20 rounded-full px-4 py-1.5 mb-6">
+            <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+            The Triple Threat Growth Ecosystem
+          </p>
+          <h1 id="hero-heading" class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6">
+            We Build Fully Automated Growth Engines For High-Value Businesses.
+          </h1>
+          <p class="text-lg sm:text-xl text-muted leading-relaxed mb-10 max-w-3xl">
+            Stop losing revenue to slow follow-ups and broken marketing. We plug your leaky bucket by combining premium web design with native AI chat support, automated traffic, and intent-based outbound sourcing.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#contact" class="inline-flex items-center justify-center font-semibold bg-accent hover:bg-indigo-500 px-8 py-3.5 rounded-xl transition-colors">
+              Fix Your Leaky Bucket
+            </a>
+            <button
+              type="button"
+              onclick="openChatDemo()"
+              class="inline-flex items-center justify-center font-semibold border border-white/10 hover:border-white/20 bg-white/5 px-8 py-3.5 rounded-xl transition-colors"
+            >
+              See The AI Chatbot In Action
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PROBLEM SECTION — "The Leaky Bucket" narrative
+         ============================================================ -->
+    <section id="problem" class="py-20 lg:py-28 bg-surface/30" aria-labelledby="problem-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="max-w-3xl mx-auto text-center mb-12">
+          <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">The Leaky Bucket</p>
+          <h2 id="problem-heading" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+            Most Marketing Budgets Are A Leaky Bucket
+          </h2>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div class="space-y-6 text-muted text-lg leading-relaxed">
+            <p>
+              You are pouring thousands into paid traffic every month — Meta ads, Google campaigns, boosted posts — and the clicks are arriving. But the revenue is not. Prospects land on your site, have questions at 7 PM on a Saturday, and find nothing but a passive brochure staring back at them.
+            </p>
+            <p>
+              No one is there to answer pricing objections. No one is there to qualify the lead. No one is there to book the call. They bounce, buy from a competitor who responded faster, and you never even knew they were interested.
+            </p>
+            <p>
+              Your website was never designed to sell — it was designed to sit there. Meanwhile, your sales team burns hours on manual research instead of closing deals that should have been captured automatically the moment intent appeared.
+            </p>
+          </div>
+
+          <div class="bg-surface border border-white/5 rounded-2xl p-8 lg:p-10 space-y-6">
+            <h3 class="text-xl font-bold text-white">The Passive Website Problem</h3>
+            <ul class="space-y-4">
+              <li class="flex gap-4">
+                <span class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 text-red-400 font-bold text-sm">01</span>
+                <div>
+                  <p class="font-semibold text-white mb-1">After-Hours Revenue Loss</p>
+                  <p class="text-muted text-sm leading-relaxed">High-intent buyers visit at night and on weekends — when your team is offline and your site cannot speak for itself.</p>
+                </div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 text-red-400 font-bold text-sm">02</span>
+                <div>
+                  <p class="font-semibold text-white mb-1">Zero Lead Qualification</p>
+                  <p class="text-muted text-sm leading-relaxed">Without a native AI chatbot, every visitor is treated the same — and your best prospects slip through unqualified.</p>
+                </div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 text-red-400 font-bold text-sm">03</span>
+                <div>
+                  <p class="font-semibold text-white mb-1">Disconnected Systems</p>
+                  <p class="text-muted text-sm leading-relaxed">Traffic, conversion, and outbound operate in silos — so no single pipeline owns the journey from click to closed deal.</p>
+                </div>
+              </li>
+            </ul>
+            <p class="text-white font-medium pt-2 border-t border-white/5">
+              We turn your website into an active, 24/7 automated sales pipeline — so every dollar of marketing spend compounds instead of evaporates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CORE VERTICALS — Triple Threat 3-card service grid
+         ============================================================ -->
+    <section id="verticals" class="py-20 lg:py-28" aria-labelledby="verticals-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+          <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">The Triple Threat</p>
+          <h2 id="verticals-heading" class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Three Verticals. One Integrated Growth Engine.</h2>
+          <p class="text-muted text-lg">Each pillar is engineered to work in concert — with native AI chat built into every website we ship.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+          <!-- Vertical 1: Premium AI-Powered Websites -->
+          <article class="card-glow group bg-surface border border-white/5 rounded-2xl p-8 transition-all duration-300 flex flex-col">
+            <div class="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-6 group-hover:bg-accent/25 transition-colors">
+              <svg class="w-6 h-6 text-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <p class="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Vertical 01</p>
+            <h3 class="text-xl font-bold mb-3">Premium AI-Powered Websites</h3>
+            <p class="text-sm font-medium text-glow mb-4">The Conversion Engine</p>
+            <p class="text-muted leading-relaxed flex-1">
+              Ultra-modern, lightning-fast storefronts that come natively equipped with a custom-trained, 24/7 AI Chat Assistant. It answers customer queries in 3 seconds, qualifies leads, and books meetings while you sleep.
+            </p>
+          </article>
+
+          <!-- Vertical 2: Meta Ads & Sales Funnels -->
+          <article class="card-glow group bg-surface border border-white/5 rounded-2xl p-8 transition-all duration-300 flex flex-col">
+            <div class="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-6 group-hover:bg-accent/25 transition-colors">
+              <svg class="w-6 h-6 text-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <p class="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Vertical 02</p>
+            <h3 class="text-xl font-bold mb-3">Meta Ads &amp; Sales Funnels</h3>
+            <p class="text-sm font-medium text-glow mb-4">The Inbound Magnet</p>
+            <p class="text-muted leading-relaxed flex-1">
+              Stop burning cash on generic ads. We launch targeted Meta campaigns paired with psychological sales funnels built to do one thing: turn cold clicks into high-value booked calls.
+            </p>
+          </article>
+
+          <!-- Vertical 3: Intent-Based Lead Sourcing -->
+          <article class="card-glow group bg-surface border border-white/5 rounded-2xl p-8 transition-all duration-300 flex flex-col">
+            <div class="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-6 group-hover:bg-accent/25 transition-colors">
+              <svg class="w-6 h-6 text-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <p class="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Vertical 03</p>
+            <h3 class="text-xl font-bold mb-3">Intent-Based Lead Sourcing</h3>
+            <p class="text-sm font-medium text-glow mb-4">The Outbound Hunter</p>
+            <p class="text-muted leading-relaxed flex-1">
+              Our custom AI software scans social networks and LinkedIn to identify buyers actively posting about problems your business solves, automatically drafting hyper-personalized outreach pitches for your executive review.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PROOF & LEVERAGE — Autonomous systems advantage
+         ============================================================ -->
+    <section id="proof" class="py-20 lg:py-28 bg-surface/30" aria-labelledby="proof-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">Proof &amp; Leverage</p>
+            <h2 id="proof-heading" class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+              The Unfair Advantage: Driven By Autonomous Systems
+            </h2>
+            <p class="text-muted text-lg leading-relaxed mb-6">
+              Our clients do not buy fragmented software tools — they buy an integrated growth pipeline where traffic, conversion, and outbound sourcing communicate flawlessly in the background 24/7.
+            </p>
+            <p class="text-muted text-lg leading-relaxed mb-8">
+              When a Meta ad generates a click, your AI-powered storefront captures it instantly — answering questions, qualifying intent, and booking calls before your team clocks in. When inbound slows, your outbound engine activates — scanning social networks for buyers showing purchase intent in real time. Every website we build ships with a native AI chatbot trained on your business, so conversion never sleeps.
+            </p>
+            <a href="#contact" class="inline-flex items-center justify-center font-semibold bg-accent hover:bg-indigo-500 px-8 py-3.5 rounded-xl transition-colors">
+              Identify Your Revenue Gaps
+            </a>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="bg-surface border border-white/5 rounded-2xl p-6">
+              <p class="text-3xl font-bold text-glow mb-2">3s</p>
+              <p class="font-semibold mb-1">AI Response Time</p>
+              <p class="text-sm text-muted leading-relaxed">Native chatbot answers customer queries instantly — nights, weekends, and holidays included.</p>
+            </div>
+            <div class="bg-surface border border-white/5 rounded-2xl p-6">
+              <p class="text-3xl font-bold text-glow mb-2">24/7</p>
+              <p class="font-semibold mb-1">Always-On Pipeline</p>
+              <p class="text-sm text-muted leading-relaxed">Autonomous systems qualify leads and book meetings while your team sleeps.</p>
+            </div>
+            <div class="bg-surface border border-white/5 rounded-2xl p-6">
+              <p class="text-3xl font-bold text-glow mb-2">3×</p>
+              <p class="font-semibold mb-1">Integrated Verticals</p>
+              <p class="text-sm text-muted leading-relaxed">AI website, Meta funnels, and outbound sourcing unified — not three disconnected vendors.</p>
+            </div>
+            <div class="bg-surface border border-white/5 rounded-2xl p-6">
+              <p class="text-3xl font-bold text-glow mb-2">1</p>
+              <p class="font-semibold mb-1">Growth Ecosystem</p>
+              <p class="text-sm text-muted leading-relaxed">One high-ticket partnership replacing a patchwork of underperforming tools.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CONTACT FORM — High-converting lead capture
+         ============================================================ -->
+    <section id="contact" class="py-20 lg:py-28" aria-labelledby="contact-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          <div>
+            <p class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">Get Started</p>
+            <h2 id="contact-heading" class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              Identify Your Revenue Gaps
+            </h2>
+            <p class="text-muted text-lg leading-relaxed mb-8">
+              Tell us where your growth engine is breaking down. We will map your leaky bucket, quantify the revenue you are leaving behind, and show you exactly how the Triple Threat ecosystem — including your native AI chatbot — plugs every gap.
+            </p>
+            <div class="space-y-4 text-muted">
+              <p class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-surface border border-white/5 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
+                hello@nexusai.agency
+              </p>
+              <p class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-surface border border-white/5 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+                Systems analysis delivered within 24 hours
+              </p>
+            </div>
+          </div>
+
+          <form class="bg-surface border border-white/5 rounded-2xl p-6 sm:p-8 space-y-5" onsubmit="handleSubmit(event)" aria-label="Revenue gap analysis form">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-2">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                placeholder="Jane Smith"
+                class="w-full bg-ink border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition"
+              />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium mb-2">Business Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="jane@company.com"
+                class="w-full bg-ink border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition"
+              />
+            </div>
+            <div>
+              <label for="website" class="block text-sm font-medium mb-2">Company Website</label>
+              <input
+                type="url"
+                id="website"
+                name="website"
+                required
+                placeholder="https://yourcompany.com"
+                class="w-full bg-ink border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition"
+              />
+            </div>
+            <div>
+              <label for="bottleneck" class="block text-sm font-medium mb-2">Your Biggest Growth Bottleneck</label>
+              <select
+                id="bottleneck"
+                name="bottleneck"
+                required
+                class="w-full bg-ink border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition"
+              >
+                <option value="" disabled selected>Select your primary bottleneck</option>
+                <option value="outdated-website-missing-chatbot">Outdated Website / Missing Chatbot</option>
+                <option value="low-ad-conversions">Low Ad Conversions</option>
+                <option value="sales-research">Sales Team Wasting Time on Research</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="w-full font-semibold bg-accent hover:bg-indigo-500 text-white py-3.5 rounded-xl transition-colors"
+            >
+              Analyze My Systems
+            </button>
+            <p id="form-success" class="hidden text-sm text-green-400 text-center">Thank you. Your systems analysis request has been received — we will be in touch within 24 hours.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       SITE FOOTER — Copyright and secondary navigation
+       ============================================================ -->
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted">
+      <p>&copy; 2026 Nexus AI. All rights reserved.</p>
+      <nav class="flex gap-6" aria-label="Footer navigation">
+        <a href="#verticals" class="hover:text-white transition-colors">Triple Threat</a>
+        <a href="#proof" class="hover:text-white transition-colors">Our Edge</a>
+        <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       FLOATING CHAT WIDGET — Native AI chatbot demo (bottom-right)
+       ============================================================ -->
+  <div
+    id="chat-widget"
+    class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3"
+    role="complementary"
+    aria-label="Native AI chatbot assistant"
+  >
+    <!-- Chat panel (expandable) -->
+    <div id="chat-panel" class="chat-panel hidden-panel w-[calc(100vw-2rem)] sm:w-96 bg-surface border border-white/10 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+      <div class="bg-accent/10 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-sm font-bold">AI</div>
+          <div>
+            <p class="text-sm font-semibold">Nexus AI Assistant</p>
+            <p class="text-xs text-green-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+              Online — Responds in 3 seconds
+            </p>
+          </div>
+        </div>
+        <button onclick="toggleChat()" class="text-muted hover:text-white p-1 transition-colors" aria-label="Close chat">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="chat-messages" class="h-72 overflow-y-auto p-4 space-y-4" aria-live="polite">
+        <div class="flex gap-2">
+          <div class="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+          <div class="bg-ink border border-white/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-muted max-w-[85%]">
+            Hi — I am the native AI assistant built into every Nexus AI website. Ask me anything about our Triple Threat growth ecosystem, or see how I qualify leads and book calls 24/7.
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-white/5 p-3">
+        <form onsubmit="sendMessage(event)" class="flex gap-2" aria-label="Chat message form">
+          <input
+            id="chat-input"
+            type="text"
+            placeholder="Type a message..."
+            class="flex-1 bg-ink border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition"
+          />
+          <button type="submit" class="bg-accent hover:bg-indigo-500 p-2.5 rounded-xl transition-colors" aria-label="Send message">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Chat toggle button -->
+    <button
+      id="chat-toggle"
+      onclick="toggleChat()"
+      class="w-14 h-14 bg-accent hover:bg-indigo-500 rounded-full shadow-lg shadow-accent/25 flex items-center justify-center transition-all hover:scale-105"
+      aria-label="Open AI chatbot"
+    >
+      <svg id="chat-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+      <svg id="chat-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    let chatOpen = false;
+
+    function toggleChat() {
+      chatOpen = !chatOpen;
+      updateChatUI();
+    }
+
+    function openChatDemo() {
+      chatOpen = true;
+      updateChatUI();
+      document.getElementById('chat-widget').scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    function updateChatUI() {
+      const panel = document.getElementById('chat-panel');
+      const iconOpen = document.getElementById('chat-icon-open');
+      const iconClose = document.getElementById('chat-icon-close');
+
+      panel.classList.toggle('hidden-panel', !chatOpen);
+      iconOpen.classList.toggle('hidden', chatOpen);
+      iconClose.classList.toggle('hidden', !chatOpen);
+
+      if (chatOpen) {
+        document.getElementById('chat-input').focus();
+      }
+    }
+
+    const botReplies = [
+      'Every website we build ships with a native AI chatbot — custom-trained on your business to answer questions, qualify leads, and book meetings in under 3 seconds.',
+      'The Triple Threat combines AI-powered websites, Meta ad funnels, and intent-based outbound sourcing into one integrated growth pipeline.',
+      'Most clients come to us losing deals at 7 PM when no one is online to answer questions. Our chatbot fixes that instantly.',
+      'Our intent-based lead sourcing scans LinkedIn and social networks for buyers actively posting about problems you solve — then drafts outreach for your review.',
+      'Ready to identify your revenue gaps? Fill out the form and we will deliver a systems analysis within 24 hours.',
+    ];
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const messages = document.getElementById('chat-messages');
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'flex gap-2 justify-end';
+      userMsg.innerHTML = `
+        <div class="bg-accent rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%]">${escapeHtml(text)}</div>
+      `;
+      messages.appendChild(userMsg);
+      input.value = '';
+      messages.scrollTop = messages.scrollHeight;
+
+      setTimeout(() => {
+        const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
+        const botMsg = document.createElement('div');
+        botMsg.className = 'flex gap-2';
+        botMsg.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
+          <div class="bg-ink border border-white/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-muted max-w-[85%]">${reply}</div>
+        `;
+        messages.appendChild(botMsg);
+        messages.scrollTop = messages.scrollHeight;
+      }, 800);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('form-success').classList.remove('hidden');
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>
